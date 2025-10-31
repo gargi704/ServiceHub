@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { API_BASE_URL } from '../api.js';
 
-const API_URL = 'http://localhost:5000/api/reviews';
+const API_URL = `${API_BASE_URL}/api/reviews`;
 
 export const fetchReviews = async (providerId) => {
   const response = await axios.get(`${API_URL}/${providerId}`);

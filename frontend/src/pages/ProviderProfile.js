@@ -10,6 +10,7 @@ import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import IconButton from '@mui/material/IconButton';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { API_BASE_URL } from '../api.js';
 
 function ProviderProfile() {
   const navigate = useNavigate();
@@ -47,7 +48,7 @@ function ProviderProfile() {
 
   useEffect(() => {
     if (!userId) return;
-    axios.get(`/api/providers/by-user/${userId}`)
+    axios.get(`${API_BASE_URL}/api/providers/by-user/${userId}`)
       .then(res => {
         if (res.data && res.data._id) {
           setProfile({
@@ -57,7 +58,7 @@ function ProviderProfile() {
           });
           setIsEditing(false);
           // fetch reviews for this provider
-          axios.get(`/api/reviews/${res.data._id}`)
+          axios.get(`${API_BASE_URL}/api/reviews/${res.data._id}`)
             .then(rev => {
               setReviewStats({
                 total: rev.data.total || 0,
@@ -88,7 +89,7 @@ function ProviderProfile() {
     formData.append('userId', userId);
     formData.append('type', type);
     try {
-      await axios.post('/api/providers/upload-files', formData, {
+      await axios.post(`${API_BASE_URL}/api/providers/upload-files`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       toast.success("File(s) uploaded successfully!");
@@ -106,14 +107,14 @@ function ProviderProfile() {
     formData.append('photo', file);
     formData.append('userId', userId);
     try {
-      const res = await axios.post('/api/providers/upload-photo', formData, {
+      const res = await axios.post(`${API_BASE_URL}/api/providers/upload-photo`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setProfile(prev => ({ ...prev, profileImage: res.data.profileImage }));
       setPreview(URL.createObjectURL(file));
 
       // Fresh profile load karo
-      const freshRes = await axios.get(`/api/providers/by-user/${userId}`);
+      const freshRes = await axios.get(`${API_BASE_URL}/api/providers/by-user/${userId}`);
       if (freshRes.data && freshRes.data._id) {
         setProfile(prev => ({ ...prev, ...freshRes.data }));
       }
@@ -150,13 +151,13 @@ function ProviderProfile() {
         ...profile,
         user: userId,
       };
-      await axios.post('/api/providers', providerData);
+      await axios.post(`${API_BASE_URL}/api/providers`, providerData);
 
       // 2. Save name in main User table
-      await axios.patch(`/api/users/${userId}`, { name: profile.user.name });
+      await axios.patch(`${API_BASE_URL}/api/users/${userId}`, { name: profile.user.name });
 
       // 3. REFRESH the loaded profile to get the new name instantly
-      const updated = await axios.get(`/api/providers/by-user/${userId}`);
+      const updated = await axios.get(`${API_BASE_URL}/api/providers/by-user/${userId}`);
       if (updated.data && updated.data._id) {
         setProfile({
           ...defaultProfile,
@@ -184,7 +185,7 @@ function ProviderProfile() {
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               <Box sx={{ position: 'relative', minWidth: 120, minHeight: 120, display: 'inline-block', mr: 3 }}>
                 <Avatar
-                  src={(preview || profile.profileImage) ? `http://localhost:5000${preview || profile.profileImage}` : undefined}
+                  src={(preview || profile.profileImage) ? `${API_BASE_URL}${preview || profile.profileImage}` : undefined}
                   sx={{
                     width: 120,
                     height: 120,

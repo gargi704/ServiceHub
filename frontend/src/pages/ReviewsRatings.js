@@ -7,6 +7,7 @@ import StarIcon from '@mui/icons-material/Star';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import axios from 'axios';
+import { API_BASE_URL } from '../api.js';
 
 function ReviewsRatings() {
   const { providerId } = useParams();
@@ -20,7 +21,7 @@ function ReviewsRatings() {
     if (!providerId) return;
     (async () => {
       try {
-        const prov = await axios.get("/api/providers/" + providerId);
+        const prov = await axios.get(`${API_BASE_URL}/api/providers/` + providerId);
         if (!prov.data || !prov.data.user) {
           setProvider({ name: '', service: '', rating: 0, totalReviews: 0, verified: false });
           return;
@@ -32,7 +33,7 @@ function ReviewsRatings() {
           totalReviews: prov.data.totalJobs || 0,
           verified: true
         });
-        const rev = await axios.get("/api/reviews/" + providerId);
+        const rev = await axios.get(`${API_BASE_URL}/api/reviews/` + providerId);
         setAllReviews(rev.data.reviews);
         setRatingStats({
           average: parseFloat(rev.data.average),
@@ -57,7 +58,7 @@ function ReviewsRatings() {
   };
 
   const handleSubmitReview = async () => {
-    await axios.post("/api/reviews", {
+    await axios.post(`${API_BASE_URL}/api/reviews`, {
       provider: providerId,
       customer: localStorage.getItem("userId"),
       rating: newReview.rating,

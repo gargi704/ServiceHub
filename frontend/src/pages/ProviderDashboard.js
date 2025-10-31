@@ -12,6 +12,7 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert'
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { API_BASE_URL } from '../api.js';
 
 function ProviderDashboard() {
   const userRole = localStorage.getItem('role');
@@ -36,7 +37,7 @@ function ProviderDashboard() {
       return;
     }
     setUserId(storedUserId);
-    axios.get(`/api/users/${storedUserId}`)
+    axios.get(`${API_BASE_URL}/api/users/${storedUserId}`)
       .then(res => setUser(res.data))
       .catch(() => setUser(null));
   }, [navigate]);
@@ -65,7 +66,7 @@ function ProviderDashboard() {
   const fetchAllData = async () => {
     if (!userId) return;
     try {
-      const providerRes = await axios.get(`/api/providers/by-user/${userId}`);
+      const providerRes = await axios.get(`${API_BASE_URL}/api/providers/by-user/${userId}`);
       const providerData = providerRes.data;
 
       if (!providerData || !providerData._id) {
@@ -78,7 +79,7 @@ function ProviderDashboard() {
       setProfile(providerData);
       localStorage.setItem('providerId', providerData._id);
 
-      const bookingsRes = await axios.get(`/api/bookings/provider/${providerData._id}`);
+      const bookingsRes = await axios.get(`${API_BASE_URL}/api/bookings/provider/${providerData._id}`);
       setBookings(bookingsRes.data);
 
       const completedJobs = bookingsRes.data.filter(b => b.status === 'completed').length;
@@ -106,17 +107,17 @@ function ProviderDashboard() {
   }, [userId]);
 
   const handleAcceptBooking = async (bookingId) => {
-    await axios.patch(`/api/bookings/status/${bookingId}`, { status: 'accepted' });
+    await axios.patch(`${API_BASE_URL}/api/bookings/status/${bookingId}`, { status: 'accepted' });
     fetchAllData();
   };
 
   const handleMarkComplete = async (bookingId) => {
-    await axios.patch(`/api/bookings/status/${bookingId}`, { status: 'completed' });
+    await axios.patch(`${API_BASE_URL}/api/bookings/status/${bookingId}`, { status: 'completed' });
     fetchAllData();
   };
 
   const handleCancelBooking = async (bookingId) => {
-    await axios.patch(`/api/bookings/status/${bookingId}`, { status: 'cancelled' });
+    await axios.patch(`${API_BASE_URL}/api/bookings/status/${bookingId}`, { status: 'cancelled' });
     fetchAllData();
   };
 
@@ -148,7 +149,7 @@ function ProviderDashboard() {
                 profile?.profileImage
                   ? (profile.profileImage.startsWith('http')
                     ? profile.profileImage
-                    : `http://localhost:5000${profile.profileImage}`)
+                    : `${API_BASE_URL}${profile.profileImage}`)
                   : undefined
               }
               sx={{

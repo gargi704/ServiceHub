@@ -9,6 +9,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PendingIcon from '@mui/icons-material/Pending';
 import CancelIcon from '@mui/icons-material/Cancel';
 import axios from 'axios';
+import { API_BASE_URL } from '../api.js';
 
 function ProviderServiceHistory() {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ function ProviderServiceHistory() {
     const providerId = localStorage.getItem('providerId'); 
     if (!providerId) return;
     //  console.log('ProviderId from localStorage:', providerId);
-    axios.get(`/api/bookings/provider/${providerId}`)
+    axios.get(`${API_BASE_URL}/api/bookings/provider/${providerId}`)
       .then(res => {
         setAllServices(
           res.data.map(b => ({

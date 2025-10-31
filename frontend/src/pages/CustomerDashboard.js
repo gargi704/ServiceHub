@@ -9,6 +9,7 @@ import HistoryIcon from '@mui/icons-material/History';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import { API_BASE_URL } from '../api.js';
 
 function CustomerDashboard() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -29,7 +30,7 @@ function CustomerDashboard() {
     async function fetchProviders() {
       setLoading(true);
       try {
-        const res = await axios.get('/api/providers');
+        const res = await axios.get(`${API_BASE_URL}/api/providers`);
         setProviders(res.data);
       } catch (error) {
         toast.error("Could not load providers!");
@@ -73,7 +74,7 @@ function CustomerDashboard() {
       status: 'pending'
     };
     try {
-      await axios.post('/api/bookings', bookingPayload);
+      await axios.post(`${API_BASE_URL}/api/bookings`, bookingPayload);
       toast.success(
         `Booking confirmed with ${selectedProvider.user?.name || selectedProvider.name}!`
       );

@@ -9,6 +9,7 @@ import PendingIcon from '@mui/icons-material/Pending';
 import CancelIcon from '@mui/icons-material/Cancel';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../api.js';
 
 function BookingHistory() {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ function BookingHistory() {
     if (!customerId) return;
     const fetchBookings = async () => {
       try {
-        const res = await axios.get('/api/bookings/customer/' + customerId)
+        const res = await axios.get(`${API_BASE_URL}/api/bookings/customer/` + customerId)
         setBookings(res.data);
       } catch (err) {
         setBookings([]);
@@ -64,8 +65,8 @@ function BookingHistory() {
   };
 
   const handleCancelBooking = async (bookingId) => {
-    await axios.patch(`/api/bookings/status/${bookingId}`, { status: 'cancelled' });
-    const res = await axios.get(`/api/bookings/customer/${customerId}`);
+    await axios.patch(`${API_BASE_URL}/api/bookings/status/${bookingId}`, { status: 'cancelled' });
+    const res = await axios.get(`${API_BASE_URL}/api/bookings/customer/${customerId}`);
     setBookings(res.data);
   };
 

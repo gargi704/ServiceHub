@@ -12,6 +12,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { API_BASE_URL } from '../api.js';  
 
 function AdminDashboard() {
   const navigate = useNavigate();
@@ -37,15 +38,15 @@ function AdminDashboard() {
 
   useEffect(() => {
     // Fetch users
-    axios.get('/api/users')
+    axios.get(`${API_BASE_URL}/api/users`)
       .then(res => setUsers(res.data))
       .catch(() => setUsers([]));
     // Fetch providers
-    axios.get('/api/providers')
+    axios.get(`${API_BASE_URL}/api/providers`)
       .then(res => setProviders(res.data))
       .catch(() => setProviders([]));
     // Fetch bookings
-    axios.get('/api/bookings')
+    axios.get(`${API_BASE_URL}/api/bookings`)
       .then(res => setBookings(res.data))
       .catch(() => setBookings([]));
   }, []);
@@ -69,7 +70,7 @@ function AdminDashboard() {
 
   const handleDelete = (id, type) => {
     if (window.confirm(`Delete ${type} #${id}?`)) {
-      axios.delete(`/api/${type.toLowerCase()}s/${id}`).then(() => window.location.reload());
+      axios.delete(`${API_BASE_URL}/api/${type.toLowerCase()}s/${id}`).then(() => window.location.reload());
     }
   };
 

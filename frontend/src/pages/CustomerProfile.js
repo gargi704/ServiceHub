@@ -8,6 +8,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import { API_BASE_URL } from '../api.js';
 
 function CustomerProfile() {
   const userId = localStorage.getItem("userId");
@@ -34,7 +35,7 @@ function CustomerProfile() {
       setLoading(true);
       const userId = localStorage.getItem('userId');
       try {
-        const res = await axios.get(`/api/users/${userId}`);
+        const res = await axios.get(`${API_BASE_URL}/api/users/${userId}`);
         setProfileData({
           name: res.data.name || '',
           email: res.data.email || '',
@@ -64,7 +65,7 @@ function CustomerProfile() {
   useEffect(() => {
     async function fetchStats() {
       try {
-        const res = await axios.get(`/api/bookings/customer/${userId}`);
+        const res = await axios.get(`${API_BASE_URL}/api/bookings/customer/${userId}`);
         const bookings = res.data || [];
         setStats({
           totalBookings: bookings.length,
@@ -91,7 +92,7 @@ function CustomerProfile() {
   const handleSave = async () => {
     try {
       const userId = localStorage.getItem('userId');
-      await axios.patch(`/api/users/${userId}`, profileData);
+      await axios.patch(`${API_BASE_URL}/api/users/${userId}`, profileData);
       setShowSuccess(true);
       setIsEditing(false);
       toast.success("Profile updated!");
@@ -121,7 +122,7 @@ function CustomerProfile() {
     }
     try {
       const userId = localStorage.getItem('userId');
-      await axios.post(`/api/users/update-password`, {
+      await axios.post(`${API_BASE_URL}/api/users/update-password`, {
         userId,
         currentPassword: passwords.currentPassword,
         newPassword: passwords.newPassword
@@ -146,7 +147,7 @@ function CustomerProfile() {
     formData.append('photo', file);
     formData.append('userId', userId);
     try {
-      const res = await axios.post('/api/users/upload-photo', formData, {
+      const res = await axios.post('${API_BASE_URL}/api/users/upload-photo', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setProfileData(prev => ({ ...prev, profileImage: res.data.profileImage }));
@@ -172,7 +173,7 @@ function CustomerProfile() {
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
               <Box sx={{ position: 'relative', mr: 3 }}>
                 <Avatar
-                  src={profileData.profileImage ? `http://localhost:5000${profileData.profileImage}` : undefined}
+                  src={profileData.profileImage ? `${API_BASE_URL}${profileData.profileImage}` : undefined}
                   sx={{
                     width: 120,
                     height: 120,
