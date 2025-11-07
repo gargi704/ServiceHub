@@ -10,7 +10,8 @@ import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import IconButton from '@mui/material/IconButton';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { API_BASE_URL } from '../api.js';
+import { API_BASE_URL } from '../api';
+import { IMAGE_SERVER } from '../api';
 
 function ProviderProfile() {
   const navigate = useNavigate();
@@ -81,22 +82,22 @@ function ProviderProfile() {
       });
   }, [userId, navigate]);
 
-  const handleUpload = (type) => async (e) => {
-    const files = e.target.files;
-    if (!files.length) return;
-    const formData = new FormData();
-    Array.from(files).forEach(file => formData.append('files', file));
-    formData.append('userId', userId);
-    formData.append('type', type);
-    try {
-      await axios.post(`${API_BASE_URL}/api/providers/upload-files`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      toast.success("File(s) uploaded successfully!");
-    } catch {
-      toast.error("Upload failed");
-    }
-  };
+  // const handleUpload = (type) => async (e) => {
+  //   const files = e.target.files;
+  //   if (!files.length) return;
+  //   const formData = new FormData();
+  //   Array.from(files).forEach(file => formData.append('files', file));
+  //   formData.append('userId', userId);
+  //   formData.append('type', type);
+  //   try {
+  //     await axios.post(`${API_BASE_URL}/api/providers/upload-files`, formData, {
+  //       headers: { 'Content-Type': 'multipart/form-data' }
+  //     });
+  //     toast.success("File(s) uploaded successfully!");
+  //   } catch {
+  //     toast.error("Upload failed");
+  //   }
+  // };
 
   const handlePhotoClick = () => fileInputRef.current.click();
 
@@ -185,7 +186,7 @@ function ProviderProfile() {
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               <Box sx={{ position: 'relative', minWidth: 120, minHeight: 120, display: 'inline-block', mr: 3 }}>
                 <Avatar
-                  src={(preview || profile.profileImage) ? `${API_BASE_URL}${preview || profile.profileImage}` : undefined}
+                  src={(preview || profile.profileImage) ? `${IMAGE_SERVER}${preview || profile.profileImage}` : undefined}
                   sx={{
                     width: 120,
                     height: 120,
@@ -440,8 +441,8 @@ function ProviderProfile() {
                   fullWidth variant="outlined" sx={{ mb: 2, bgcolor: "#e9efff" }}
                   onClick={() => navigate(`/reviews/${profile._id}`)}
                   disabled={!profile._id}
-                >VIEW MY REVIEWS</Button>
-                <Button fullWidth variant="outlined" sx={{ mb: 2 }} component="label">
+                >VIEW YOUR REVIEWS</Button>
+                {/* <Button fullWidth variant="outlined" sx={{ mb: 2 }} component="label">
                   UPLOAD ID PROOF
                   <input hidden type="file" accept="image/*" onChange={handleUpload('idProof')} />
                 </Button>
@@ -452,7 +453,7 @@ function ProviderProfile() {
                 <Button fullWidth variant="outlined" component="label">
                   UPLOAD WORK PHOTOS
                   <input hidden type="file" accept="image/*" multiple onChange={handleUpload('workPhotos')} />
-                </Button>
+                </Button> */}
               </CardContent>
             </Card>
           </Grid>

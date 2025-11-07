@@ -15,8 +15,7 @@ import ProviderProfile from './pages/ProviderProfile';
 import ReviewsRatings from './pages/ReviewsRatings';
 import BookingHistory from './pages/BookingHistory';
 import ProviderServiceHistory from './pages/ProviderServiceHistory';
-
-
+import Help from './components/help';
 
 const theme = createTheme({
   palette: {
@@ -37,6 +36,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/help" element={<Help />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/provider-dashboard" element={<ProviderDashboard />} />
@@ -47,6 +47,7 @@ function App() {
           <Route path="/reviews/:providerId" element={<ReviewsRatings />} />
           <Route path="/booking-history" element={<BookingHistory />} />
           <Route path="/provider-service-history" element={<ProviderServiceHistory />} />
+          <Route path="/dashboard" element={<CustomerDashboard />} />
         </Routes>
       </Router>
     </ThemeProvider>

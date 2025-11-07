@@ -64,6 +64,19 @@ router.get('/', async (req, res) => {
   res.json(users);
 });
 
+router.patch('/:userId/status', async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.params.userId,
+      { status: 'inactive' },
+      { new: true }
+    );
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+    res.json({ message: 'User deactivated (inactive) successfully.', user });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
 
 
 module.exports = router;

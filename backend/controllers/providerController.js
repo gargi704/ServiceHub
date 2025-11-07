@@ -75,34 +75,34 @@ exports.updateProviderPhoto = async (req, res) => {
   }
 };
 
-exports.uploadProviderFiles = async (req, res) => {
-  try {
-    const { userId, type } = req.body;
-    if (!userId || !type) return res.status(400).json({ error: "Missing userId or type" });
-    if (!req.files || !req.files.length) return res.status(400).json({ error: "No files uploaded" });
-    const filePaths = req.files.map(f => `/uploads/${f.filename}`);
+// exports.uploadProviderFiles = async (req, res) => {
+//   try {
+//     const { userId, type } = req.body;
+//     if (!userId || !type) return res.status(400).json({ error: "Missing userId or type" });
+//     if (!req.files || !req.files.length) return res.status(400).json({ error: "No files uploaded" });
+//     const filePaths = req.files.map(f => `/uploads/${f.filename}`);
 
-    // Build update object for provider doc
-    const updateObj = {};
-    if (['idProof', 'certificates', 'workPhotos'].includes(type)) {
-      updateObj[type] = filePaths;
-    } else {
-      return res.status(400).json({ error: "Invalid upload type" });
-    }
+//     // Build update object for provider doc
+//     const updateObj = {};
+//     if (['idProof', 'certificates', 'workPhotos'].includes(type)) {
+//       updateObj[type] = filePaths;
+//     } else {
+//       return res.status(400).json({ error: "Invalid upload type" });
+//     }
 
-    // Update: push-upload (append to array, not replace)
-    const provider = await Provider.findOneAndUpdate(
-      { user: userId },
-      { $push: { [type]: { $each: filePaths } } },
-      { new: true }
-    );
-    if (!provider) return res.status(404).json({ error: "Provider not found" });
+//     // Update: push-upload (append to array, not replace)
+//     const provider = await Provider.findOneAndUpdate(
+//       { user: userId },
+//       { $push: { [type]: { $each: filePaths } } },
+//       { new: true }
+//     );
+//     if (!provider) return res.status(404).json({ error: "Provider not found" });
 
-    res.json({ [type]: provider[type] }); 
-  } catch (error) {
-    res.status(500).json({ error: error.message || "Upload failed" });
-  }
-};
+//     res.json({ [type]: provider[type] }); 
+//   } catch (error) {
+//     res.status(500).json({ error: error.message || "Upload failed" });
+//   }
+// };
 
 
 // Get all providers (for customer dashboard)

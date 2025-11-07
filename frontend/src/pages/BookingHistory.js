@@ -24,9 +24,9 @@ function BookingHistory() {
     if (!customerId) return;
     const fetchBookings = async () => {
       try {
-        const res = await axios.get(`${API_BASE_URL}/api/bookings/customer/` + customerId)
+        const res = await axios.get(`${API_BASE_URL}/api/bookings/customer/${customerId}`);
         setBookings(res.data);
-      } catch (err) {
+      } catch {
         setBookings([]);
       }
       setLoading(false);
@@ -34,7 +34,6 @@ function BookingHistory() {
     fetchBookings();
   }, [customerId]);
 
-  // Filter bookings by status
   const completedBookings = bookings.filter(b => b.status === 'completed');
   const pendingBookings = bookings.filter(b => b.status === 'pending' || b.status === 'accepted');
   const cancelledBookings = bookings.filter(b => b.status === 'cancelled');
@@ -70,7 +69,6 @@ function BookingHistory() {
     setBookings(res.data);
   };
 
-  // Tab filter
   const getCurrentBookings = () => {
     if (tabValue === 0) return bookings;
     if (tabValue === 1) return completedBookings;
@@ -79,19 +77,16 @@ function BookingHistory() {
     return bookings;
   };
 
-  // Booking card
+
   const BookingCard = ({ booking }) => (
     <Card elevation={3} sx={{ mb: 3, borderRadius: 4 }}>
       <CardContent>
         <Grid container spacing={2}>
-          {/* Left section */}
-          <Grid item xs={12} md={8}>
+          {/* Left summary info */}
+          <Grid item xs={12} md={10}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               <Avatar
-                sx={{
-                  width: 56, height: 56, fontSize: 28,
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', mr: 2
-                }}
+                sx={{ width: 56, height: 56, fontSize: 28, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', mr: 2 }}
               >
                 {booking.provider?.user?.name ? booking.provider.user.name[0] : ''}
               </Avatar>
@@ -105,7 +100,7 @@ function BookingHistory() {
                 <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
                   <Chip
                     icon={getStatusIcon(booking.status)}
-                    label={(booking.status === 'accepted' ? 'PENDING (ACCEPTED)' : booking.status?.toUpperCase())}
+                    label={booking.status === 'accepted' ? 'PENDING (ACCEPTED)' : booking.status?.toUpperCase()}
                     color={getStatusColor(booking.status)}
                     size="small"
                     sx={{ mr: 2 }}
@@ -116,77 +111,63 @@ function BookingHistory() {
                 </Box>
               </Box>
             </Box>
-            <Divider sx={{ mb: 2 }} />
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <Typography variant="caption" color="text.secondary">Date</Typography>
-                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                  {new Date(booking.date).toLocaleDateString('en-IN')}
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="caption" color="text.secondary">Time</Typography>
-                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                  {booking.time}
-                </Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography variant="caption" color="text.secondary">Service Location</Typography>
-                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                  {booking.address}
-                </Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography variant="caption" color="text.secondary">Provider Phone</Typography>
-                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                  {booking.provider?.phone || booking.provider?.user?.phone || "--"}
-                </Typography>
-              </Grid>
-            </Grid>
           </Grid>
-          {/* Right section */}
-          <Grid item xs={12} md={4} sx={{ textAlign: { xs: 'left', md: 'right' }, mt: { xs: 2, md: 0 } }}>
-            <Typography variant="caption" color="text.secondary">Earnings</Typography>
-            <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#667eea', mb: 2 }}>
-              ₹{booking.amount}
-            </Typography>
-            <Typography variant="caption" color="text.secondary" sx={{ mb: 1 }}>
-              Customer Rating
-            </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'flex-start', md: 'flex-end' }, mb: 2, mt: 0.5 }}>
-              <Rating value={booking.provider?.rating || booking.rating || 0} readOnly size="medium" sx={{ mr: 1 }} />
-              <Typography variant="h6" sx={{ fontWeight: 'bold', color: "#fbc02d" }}>
-                {booking.provider?.rating
-                  ? booking.provider.rating.toFixed(1)
-                  : (booking.rating ? booking.rating : '--')
-                }
-              </Typography>
-            </Box>
+          {/* Right buttons */}
+          <Grid item xs={12} md={2} sx={{ display: 'flex', flexDirection: "column", gap: 1 }}>
             <Button
               fullWidth
               variant="outlined"
+              size="small"
               startIcon={<VisibilityIcon />}
               onClick={() => handleViewDetails(booking)}
-              sx={{ mb: 1 }}
+              sx={{
+                fontSize: { xs: "0.96rem", md: "1rem" },
+                borderRadius: 3,
+                py: 0.7,
+                px: 1,
+                minHeight: 0,
+                mt: 0,
+              }}
             >
               View Details
             </Button>
+
             {(booking.status === 'pending' || booking.status === 'accepted') && (
               <Button
                 fullWidth
                 variant="contained"
                 color="error"
                 onClick={() => handleCancelBooking(booking._id)}
-                sx={{ mt: 1 }}
+                sx={{
+                  py: 0.7,
+                  px: 1,
+                  mt: 1,
+                  borderRadius: 3,
+                  fontWeight: "bold",
+                  fontSize: { xs: "0.97rem", md: "1rem" },
+                  letterSpacing: 0.6,
+                  boxShadow: "0 2px 10px 0 rgba(255,58,113,0.16)",
+                  background: "linear-gradient(90deg,#fc466b 0%,#3f5efb 100%)",
+                  color: "#fff",
+                  transition: "all 0.2s cubic-bezier(0.4,0,0.2,1)",
+                  "&:hover": {
+                    background: "linear-gradient(90deg, #fc466b 20%, #3f5efb 90%)",
+                    boxShadow: "0 4px 14px 0 rgba(255,58,113,0.21)",
+                    transform: "scale(1.018)"
+                  }
+                }}
               >
-                Cancel Booking
+                CANCEL BOOKING
               </Button>
             )}
+
           </Grid>
+
         </Grid>
       </CardContent>
     </Card>
   );
+
 
   return (
     <>
@@ -205,10 +186,11 @@ function BookingHistory() {
             View all your past and upcoming bookings
           </Typography>
         </Box>
+
         {/* Status summary cards */}
         <Grid container spacing={3} sx={{ mb: 4 }}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card elevation={2} sx={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
+            <Card elevation={2} sx={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white', minHeight: 98 }}>
               <CardContent>
                 <Typography variant="h3" sx={{ fontWeight: 'bold' }}>{bookings.length}</Typography>
                 <Typography variant="body2">Total Bookings</Typography>
@@ -216,7 +198,7 @@ function BookingHistory() {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card elevation={2} sx={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', color: 'white' }}>
+            <Card elevation={2} sx={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', color: 'white', minHeight: 98 }}>
               <CardContent>
                 <Typography variant="h3" sx={{ fontWeight: 'bold' }}>{completedBookings.length}</Typography>
                 <Typography variant="body2">Completed</Typography>
@@ -224,7 +206,7 @@ function BookingHistory() {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card elevation={2} sx={{ background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', color: 'white' }}>
+            <Card elevation={2} sx={{ background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', color: 'white', minHeight: 98 }}>
               <CardContent>
                 <Typography variant="h3" sx={{ fontWeight: 'bold' }}>{pendingBookings.length}</Typography>
                 <Typography variant="body2">Pending</Typography>
@@ -232,7 +214,7 @@ function BookingHistory() {
             </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Card elevation={2} sx={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', color: 'white' }}>
+            <Card elevation={2} sx={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', color: 'white', minHeight: 98 }}>
               <CardContent>
                 <Typography variant="h3" sx={{ fontWeight: 'bold' }}>{cancelledBookings.length}</Typography>
                 <Typography variant="body2">Cancelled</Typography>
@@ -240,10 +222,11 @@ function BookingHistory() {
             </Card>
           </Grid>
         </Grid>
+
         {/* Tabs */}
         <Card elevation={3}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs value={tabValue} onChange={handleTabChange}>
+            <Tabs value={tabValue} onChange={handleTabChange} variant="scrollable" scrollButtons allowScrollButtonsMobile aria-label="Booking tabs">
               <Tab label={`All (${bookings.length})`} />
               <Tab label={`Completed (${completedBookings.length})`} />
               <Tab label={`Pending (${pendingBookings.length})`} />
@@ -251,22 +234,26 @@ function BookingHistory() {
             </Tabs>
           </Box>
         </Card>
+
         {/* Booking list */}
         <Box sx={{ mt: 3 }}>
           {loading ? (
             <Typography>Loading...</Typography>
           ) : getCurrentBookings().length > 0 ? (
-            getCurrentBookings().map((booking) =>
+            getCurrentBookings().map(booking =>
               <BookingCard key={booking._id} booking={booking} />
             )
           ) : (
-            <Card elevation={2}><CardContent sx={{ textAlign: 'center', py: 6 }}>
-              <Typography variant="h6" color="text.secondary">No bookings found</Typography>
-            </CardContent></Card>
+            <Card elevation={2}>
+              <CardContent sx={{ textAlign: 'center', py: 6 }}>
+                <Typography variant="h6" color="text.secondary">No bookings found</Typography>
+              </CardContent>
+            </Card>
           )}
         </Box>
       </Container>
-      {/* Booking Details Dialog */}
+
+      {/* Booking Details Dialog with Full Info */}
       <Dialog
         open={openDetailsDialog}
         onClose={handleCloseDialog}
@@ -277,7 +264,7 @@ function BookingHistory() {
             borderRadius: 4,
             width: "600px",
             p: 3,
-            minWidth: 500,
+            minWidth: 300,
             minHeight: 300,
             m: "0 auto"
           }
@@ -294,20 +281,14 @@ function BookingHistory() {
             <Grid container spacing={2} alignItems="center" sx={{ mb: 1 }}>
               <Grid item xs={12} sm={3}>
                 <Typography variant="body2" sx={{ color: "gray" }}>Service ID</Typography>
-                <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                  #{selectedBooking._id}
-                </Typography>
+                <Typography variant="body1" sx={{ fontWeight: "bold" }}>#{selectedBooking._id}</Typography>
               </Grid>
               <Grid item xs={12} sm={2}>
                 <Typography variant="body2" sx={{ color: "gray" }}>Status</Typography>
                 <Chip
-                  icon={getStatusIcon(bookings.status)}
-                  label={
-                    bookings.status
-                      ? bookings.status.toUpperCase()
-                      : "--"
-                  }
-                  color={getStatusColor(bookings.status)}
+                  icon={getStatusIcon(selectedBooking.status)}
+                  label={selectedBooking.status ? selectedBooking.status.toUpperCase() : "--"}
+                  color={getStatusColor(selectedBooking.status)}
                   size="small"
                   sx={{ mr: 2 }}
                 />
@@ -349,7 +330,6 @@ function BookingHistory() {
                 </Typography>
               </Grid>
             </Grid>
-            {/* Second ROW */}
             <Grid container spacing={2} alignItems="center" sx={{ mt: 2 }}>
               <Grid item xs={12} sm={4}>
                 <Typography variant="body2" sx={{ color: "gray" }}>Provider Phone</Typography>
@@ -370,17 +350,8 @@ function BookingHistory() {
                 </Box>
               </Grid>
             </Grid>
-            {/* CLOSE BUTTON */}
             <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
-              <Button
-                variant="contained"
-                onClick={handleCloseDialog}
-                sx={{
-                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                  width: 120,
-                  fontWeight: "bold"
-                }}
-              >
+              <Button variant="contained" onClick={handleCloseDialog} sx={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", width: 120, fontWeight: "bold" }}>
                 CLOSE
               </Button>
             </Box>

@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Container, Box, Typography, Card, CardContent, Grid, TextField, Button, Avatar, IconButton, Divider, Alert } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogActions from '@mui/material/DialogActions';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
@@ -8,6 +11,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import { IMAGE_SERVER } from '../api';
 import { API_BASE_URL } from '../api.js';
 
 function CustomerProfile() {
@@ -18,6 +22,8 @@ function CustomerProfile() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [stats, setStats] = useState({ totalBookings: 0, completedServices: 0, totalSpent: 0 });
   const [loading, setLoading] = useState(true);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userStatus, setUserStatus] = useState('active');
   const [profileData, setProfileData] = useState({
     name: '',
     email: '',
@@ -29,13 +35,24 @@ function CustomerProfile() {
     profileImage: ''
   });
 
-
   useEffect(() => {
+    if (!userId || userId === "null" || userId === "undefined") {
+      toast.error("Session expired. Please login again.");
+      localStorage.clear();
+      navigate('/login');
+      return;
+    }
     async function fetchProfile() {
       setLoading(true);
-      const userId = localStorage.getItem('userId');
       try {
         const res = await axios.get(`${API_BASE_URL}/api/users/${userId}`);
+        setUserStatus(res.data.status || 'active');
+        if (res.data.status !== 'active') {
+          toast.error('Your account is inactive. Redirecting to login.');
+          localStorage.clear();
+          navigate('/login');
+          return;
+        }
         setProfileData({
           name: res.data.name || '',
           email: res.data.email || '',
@@ -55,12 +72,14 @@ function CustomerProfile() {
           setIsEditing(true);
         } else {
           toast.error("Could not load profile!");
+          localStorage.clear();
+          navigate('/login');
         }
       }
       setLoading(false);
     }
     fetchProfile();
-  }, []);
+  }, [navigate, userId]);
 
   useEffect(() => {
     async function fetchStats() {
@@ -80,7 +99,6 @@ function CustomerProfile() {
     }
     if (userId) fetchStats();
   }, [userId]);
-
 
   const handleInputChange = (e) => {
     setProfileData({
@@ -147,7 +165,7 @@ function CustomerProfile() {
     formData.append('photo', file);
     formData.append('userId', userId);
     try {
-      const res = await axios.post('${API_BASE_URL}/api/users/upload-photo', formData, {
+      const res = await axios.post(`${API_BASE_URL}/api/users/upload-photo`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setProfileData(prev => ({ ...prev, profileImage: res.data.profileImage }));
@@ -157,6 +175,18 @@ function CustomerProfile() {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    try {
+      await axios.patch(`${API_BASE_URL}/api/users/${userId}/status`);
+      localStorage.clear();
+      toast.success("Account deactivated. Sorry to see you go!");
+      navigate('/login');
+    } catch (err) {
+      toast.error("Could not deactivate account. Try again!");
+    } finally {
+      setDeleteDialogOpen(false);
+    }
+  };
 
   return (
     <>
@@ -170,10 +200,10 @@ function CustomerProfile() {
 
         <Card elevation={3} sx={{ mb: 4 }}>
           <CardContent>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-              <Box sx={{ position: 'relative', mr: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, flexDirection: { xs: "column", sm: "row" }, gap: { xs: 2, sm: 0 } }}>
+              <Box sx={{ position: 'relative', mr: { sm: 3, xs: 0 }, mb: { xs: 2, sm: 0 } }}>
                 <Avatar
-                  src={profileData.profileImage ? `${API_BASE_URL}${profileData.profileImage}` : undefined}
+                  src={profileData.profileImage ? `${IMAGE_SERVER}${profileData.profileImage}` : undefined}
                   sx={{
                     width: 120,
                     height: 120,
@@ -215,6 +245,7 @@ function CustomerProfile() {
               </Box>
               <Button
                 variant={isEditing ? 'contained' : 'outlined'}
+                disabled={userStatus !== 'active'}
                 startIcon={isEditing ? <SaveIcon /> : <EditIcon />}
                 onClick={() => {
                   if (isEditing) handleSave(); else setIsEditing(true);
@@ -227,9 +258,7 @@ function CustomerProfile() {
                   }
                 }}
               >
-                {isEditing
-                  ? (profileData.name ? 'Save Changes' : 'Save Profile')
-                  : 'Edit Profile'}
+                {isEditing ? (profileData.name ? 'Save Changes' : 'Save Profile') : 'Edit Profile'}
               </Button>
             </Box>
           </CardContent>
@@ -337,7 +366,6 @@ function CustomerProfile() {
                   )}
                 </CardContent>
               </Card>
-
               <Card elevation={3} sx={{ mt: 3 }}>
                 <CardContent>
                   <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3, color: '#333' }}>
@@ -391,51 +419,98 @@ function CustomerProfile() {
               </Card>
             </Grid>
 
+            {/* PROFILE STATISTICS BLOCK - HORIZONTAL, RESPONSIVE */}
             <Grid item xs={12} md={4}>
               <Card elevation={3} sx={{ mb: 3 }}>
-                <CardContent>
-                  <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: '#333' }}>
+                <CardContent sx={{ px: { xs: 1, sm: 2.5 }, py: { xs: 2, md: 3 } }}>
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3, color: '#333', textAlign: "center" }}>
                     Account Statistics
                   </Typography>
-                  <Divider sx={{ mb: 2 }} />
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="body2" color="text.secondary">
-                      Total Bookings
-                    </Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#667eea' }}>
-                      {stats.totalBookings}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="body2" color="text.secondary">
-                      Completed Services
-                    </Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#4facfe' }}>
-                      {stats.completedServices}
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <Typography variant="body2" color="text.secondary">
-                      Total Spent
-                    </Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#f5576c' }}>
-                      ₹{stats.totalSpent}
-                    </Typography>
-                  </Box>
+                  <Grid
+                    container
+                    spacing={3}
+                    justifyContent="center"
+                    alignItems="stretch"
+                    sx={{
+                      width: '100%',
+                      mx: 0,
+                    }}
+                  >
+                    <Grid item xs={12} sm={4}>
+                      <Box sx={{
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        color: 'white',
+                        py: 3.5,
+                        px: 2.5,
+                        borderRadius: 3,
+                        textAlign: 'center',
+                        height: '100%',
+                        minWidth: { xs: '100%', sm: '140px', md: '180px' },
+                        maxWidth: { xs: '100%', sm: '250px' },
+                        mx: 'auto',
+                        boxShadow: 3,
+                      }}>
+                        <Typography variant="body2" sx={{ opacity: 0.92, fontSize: 16 }}>
+                          Total Bookings
+                        </Typography>
+                        <Typography variant="h3" sx={{ fontWeight: 'bold', mt: 0.6 }}>
+                          {stats.totalBookings}
+                        </Typography>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                      <Box sx={{
+                        background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                        color: 'white',
+                        py: 3.5,
+                        px: 2.5,
+                        borderRadius: 3,
+                        textAlign: 'center',
+                        height: '100%',
+                        minWidth: { xs: '100%', sm: '140px', md: '180px' },
+                        maxWidth: { xs: '100%', sm: '250px' },
+                        mx: 'auto',
+                        boxShadow: 3,
+                      }}>
+                        <Typography variant="body2" sx={{ opacity: 0.92, fontSize: 16 }}>
+                          Completed Services
+                        </Typography>
+                        <Typography variant="h3" sx={{ fontWeight: 'bold', mt: 0.6 }}>
+                          {stats.completedServices}
+                        </Typography>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                      <Box sx={{
+                        background: 'linear-gradient(135deg, #f5576c 0%, #f093fb 100%)',
+                        color: 'white',
+                        py: 3.5,
+                        px: 2.5,
+                        borderRadius: 3,
+                        textAlign: 'center',
+                        height: '100%',
+                        minWidth: { xs: '100%', sm: '140px', md: '180px' },
+                        maxWidth: { xs: '100%', sm: '250px' },
+                        mx: 'auto',
+                        boxShadow: 3,
+                      }}>
+                        <Typography variant="body2" sx={{ opacity: 0.92, fontSize: 16 }}>
+                          Total Spent
+                        </Typography>
+                        <Typography variant="h3" sx={{ fontWeight: 'bold', mt: 0.6 }}>
+                          ₹{stats.totalSpent}
+                        </Typography>
+                      </Box>
+                    </Grid>
+                  </Grid>
                 </CardContent>
               </Card>
+
               <Card elevation={3}>
                 <CardContent>
                   <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: '#333' }}>
                     Quick Actions
                   </Typography>
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    sx={{ mb: 2 }}
-                  >
-                    View Booking History
-                  </Button>
                   <Button
                     fullWidth
                     variant="outlined"
@@ -447,8 +522,9 @@ function CustomerProfile() {
                     fullWidth
                     variant="outlined"
                     color="error"
+                    onClick={() => setDeleteDialogOpen(true)}
                   >
-                    Delete Account
+                    Deactivate Account
                   </Button>
                 </CardContent>
               </Card>
@@ -456,6 +532,15 @@ function CustomerProfile() {
           </Grid>
         )}
       </Container>
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogTitle>Are you sure you want to delete your account? This action cannot be undone.</DialogTitle>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleDeleteAccount} color="error" variant="contained">
+            Deactivate Account
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Footer />
     </>
   );

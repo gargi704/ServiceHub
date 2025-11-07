@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Container, Box, Typography, Card, CardContent, Grid, Avatar, Rating, Button, Divider, Chip, LinearProgress, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
+import {
+  Container, Box, Typography, Card, CardContent, Grid, Avatar, Rating, Button,
+  Divider, Chip, LinearProgress, Dialog, DialogTitle, DialogContent, DialogActions, TextField
+} from '@mui/material';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import StarIcon from '@mui/icons-material/Star';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import axios from 'axios';
 import { API_BASE_URL } from '../api.js';
 
 function ReviewsRatings() {
+  const userRole = localStorage.getItem("role");
+  const userId = localStorage.getItem("userId");
   const { providerId } = useParams();
   const [openReviewDialog, setOpenReviewDialog] = useState(false);
   const [newReview, setNewReview] = useState({ rating: 0, title: '', comment: '' });
@@ -50,7 +54,6 @@ function ReviewsRatings() {
     })();
   }, [providerId, openReviewDialog]);
 
-
   const handleOpenReviewDialog = () => setOpenReviewDialog(true);
   const handleCloseReviewDialog = () => {
     setOpenReviewDialog(false);
@@ -68,39 +71,53 @@ function ReviewsRatings() {
     handleCloseReviewDialog();
   };
 
-  // if (!providerId) return <div>Loading...</div>;
-  // if (!provider.name) return <div>Provider Not Found</div>;
-
   return (
     <>
       <Navbar />
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 6 }}>
-        <Card elevation={3} sx={{ mb: 4 }}>
+      <Container maxWidth="lg" sx={{ mt: { xs: 2, sm: 4 }, mb: { xs: 3, sm: 6 } }}>
+        <Card elevation={3} sx={{ mb: { xs: 2, md: 4 }, p: { xs: 1, md: 0 } }}>
           <CardContent>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box sx={{
+              display: 'flex',
+              flexDirection: { xs: 'column', sm: 'row' },
+              alignItems: { xs: 'flex-start', sm: 'center' },
+              justifyContent: 'space-between',
+              gap: { xs: 2, sm: 0 }
+            }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <Avatar
                   sx={{
-                    width: 80,
-                    height: 80,
-                    mr: 3,
+                    width: 70,
+                    height: 70,
                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                     fontSize: '2rem'
                   }}
                 >{provider.name ? provider.name.split(' ').map(n => n[0]).join('') : "P"}</Avatar>
                 <Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333', mr: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: .5, flexWrap: 'wrap' }}>
+                    <Typography
+                      variant="h5"
+                      sx={{
+                        fontWeight: 700,
+                        color: '#333',
+                        mr: 1,
+                        fontSize: { xs: 17, sm: 20 }
+                      }}>
                       {provider.name}
                     </Typography>
-                    {provider.verified && <Chip icon={<VerifiedIcon />} label="Verified" color="success" size="small" />}
+                    {provider.verified &&
+                      <Chip icon={<VerifiedIcon />} label="Verified" color="success" size="small" />}
                   </Box>
-                  <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ fontSize: { xs: 14, sm: 16 }, mb: 1 }}
+                  >
                     {provider.service}
                   </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                     <Rating value={ratingStats.average || 0} precision={0.1} readOnly />
-                    <Typography variant="h6" sx={{ ml: 1, fontWeight: 'bold' }}>
+                    <Typography variant="body1" sx={{ ml: 1, fontWeight: 600 }}>
                       {ratingStats.average}
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
@@ -109,28 +126,32 @@ function ReviewsRatings() {
                   </Box>
                 </Box>
               </Box>
-              <Button
-                variant="contained"
-                onClick={handleOpenReviewDialog}
-                sx={{
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  px: 4
-                }}
-              >Write a Review</Button>
+              {userRole === "customer" && userId && userId !== providerId && (
+                <Button
+                  variant="contained"
+                  onClick={handleOpenReviewDialog}
+                  sx={{
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    px: 4, mt: { xs: 2, sm: 0 }
+                  }}
+                  size="large"
+                >
+                  Write a Review
+                </Button>
+              )}
             </Box>
           </CardContent>
         </Card>
 
-        <Grid container spacing={3}>
-          {/* Rating Breakdown */}
+        <Grid container spacing={{ xs: 2, md: 3 }}>
           <Grid item xs={12} md={4}>
-            <Card elevation={3} sx={{ position: 'sticky', top: 20 }}>
+            <Card elevation={3} sx={{ position: { md: 'sticky' }, top: 20, mb: { xs: 2, md: 0 } }}>
               <CardContent>
                 <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3, color: '#333' }}>
                   Rating Breakdown
                 </Typography>
                 <Box sx={{ textAlign: 'center', mb: 3 }}>
-                  <Typography variant="h2" sx={{ fontWeight: 'bold', color: '#667eea' }}>
+                  <Typography variant="h2" sx={{ fontWeight: 'bold', color: '#667eea', fontSize: { xs: 32, sm: 42 } }}>
                     {ratingStats.average}
                   </Typography>
                   <Rating value={ratingStats.average || 0} precision={0.1} readOnly size="large" />
@@ -141,7 +162,7 @@ function ReviewsRatings() {
                 <Divider sx={{ mb: 3 }} />
                 {ratingStats.breakdown.map((item) => (
                   <Box key={item.stars} sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="body2" sx={{ width: 30 }}>
+                    <Typography variant="body2" sx={{ width: 32, fontSize: { xs: 13, sm: 15 } }}>
                       {item.stars} ⭐
                     </Typography>
                     <LinearProgress
@@ -156,7 +177,9 @@ function ReviewsRatings() {
                         '& .MuiLinearProgress-bar': { backgroundColor: '#667eea' }
                       }}
                     />
-                    <Typography variant="body2" sx={{ width: 40, textAlign: 'right' }}>
+                    <Typography variant="body2" sx={{
+                      width: 30, textAlign: 'right', fontSize: { xs: 13, sm: 15 }
+                    }}>
                       {item.count}
                     </Typography>
                   </Box>
@@ -165,26 +188,50 @@ function ReviewsRatings() {
             </Card>
           </Grid>
 
-          {/* Reviews List */}
           <Grid item xs={12} md={8}>
-            <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3, color: '#333' }}>
+            <Typography variant="h5" sx={{
+              fontWeight: 'bold',
+              mb: 3,
+              color: '#333',
+              fontSize: { xs: 18, sm: 22 }
+            }}>
               Customer Reviews ({allReviews.length})
             </Typography>
+            {allReviews.length === 0 && (
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mb: 2, textAlign: "center", fontSize: { xs: 15, sm: 17 } }}
+              >
+                No reviews yet. Be the first to add a review!
+              </Typography>
+            )}
             {allReviews.map((review) => (
-              <Card key={review._id} elevation={2} sx={{ mb: 3 }}>
+              <Card key={review._id} elevation={1} sx={{
+                mb: 3,
+                p: { xs: 1, sm: 2 }
+              }}>
                 <CardContent>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Box sx={{
+                    display: 'flex',
+                    flexDirection: { xs: "column", sm: "row" },
+                    justifyContent: 'space-between',
+                    mb: 2
+                  }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Avatar sx={{ mr: 2, background: '#667eea' }}>
                         {review.customer?.name?.charAt(0) || "U"}
                       </Avatar>
                       <Box>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', fontSize: { xs: 15, sm: 17 } }}>
                             {review.customer?.name || "User"}
                           </Typography>
                         </Box>
-                        <Typography variant="caption" color="text.secondary">
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ fontSize: { xs: 13, sm: 14 } }}>
                           {new Date(review.createdAt).toLocaleDateString('en-IN', {
                             year: 'numeric',
                             month: 'long',
@@ -193,19 +240,23 @@ function ReviewsRatings() {
                         </Typography>
                       </Box>
                     </Box>
-                    <Rating value={review.rating} readOnly size="small" />
+                    <Rating value={review.rating} readOnly size="small" sx={{ mt: { xs: 1, sm: 0 } }} />
                   </Box>
-                  {review.title && <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
+                  {review.title && <Typography variant="subtitle2" sx={{
+                    fontWeight: 'bold', mb: 1, fontSize: { xs: 15, sm: 16 }
+                  }}>
                     {review.title}
                   </Typography>}
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  <Typography variant="body2" color="text.secondary" sx={{
+                    mb: 2, fontSize: { xs: 14, sm: 15 }
+                  }}>
                     {review.comment}
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <Button
                       size="small"
                       startIcon={<ThumbUpIcon />}
-                      sx={{ color: '#667eea' }}
+                      sx={{ color: '#667eea', fontSize: { xs: 13, sm: 15 } }}
                     >
                       Helpful
                     </Button>
@@ -219,10 +270,12 @@ function ReviewsRatings() {
 
       {/* Write Review Dialog */}
       <Dialog open={openReviewDialog} onClose={handleCloseReviewDialog} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ fontWeight: 'bold', color: '#333' }}>
+        <DialogTitle sx={{
+          fontWeight: 'bold', color: '#333', fontSize: { xs: 18, sm: 22 }
+        }}>
           Write a Review for {provider.name}
         </DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ px: { xs: 1, sm: 3 } }}>
           <Box sx={{ mt: 2 }}>
             <Typography variant="body2" sx={{ mb: 1 }}>
               Your Rating *

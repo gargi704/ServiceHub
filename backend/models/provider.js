@@ -18,9 +18,9 @@ const providerSchema = new mongoose.Schema({
   totalJobs: { type: Number, default: 0 },
   completedJobs: { type: Number, default: 0 },
   earnings: { type: Number, default: 0 },
-  idProof: [{ type: String }],  
-  certificates: [{ type: String }], 
-  workPhotos: [{ type: String }],
+  // idProof: [{ type: String }],  
+  // certificates: [{ type: String }], 
+  // workPhotos: [{ type: String }],
   createdAt: { type: Date, default: Date.now }
 });
 

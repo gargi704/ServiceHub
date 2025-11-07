@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Box, Typography, Card, CardContent, Grid, TextField, Button, Chip, Avatar, Rating, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import {
+  Container, Box, Typography, Card, CardContent, Grid, TextField,
+  Button, Chip, Avatar, Rating, Dialog, DialogTitle, DialogContent,
+  DialogActions, FormControl, InputLabel, Select, MenuItem
+} from '@mui/material';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import SearchIcon from '@mui/icons-material/Search';
@@ -56,13 +60,11 @@ function CustomerDashboard() {
     setBookingAddress('');
   };
 
-  // Send booking to backend on confirm
   const handleConfirmBooking = async () => {
     if (!selectedProvider || !bookingDate || !bookingTime || !bookingAddress) {
       toast.error("Please enter all booking details!");
       return;
     }
-    // BUILD BOOKING PAYLOAD
     const bookingPayload = {
       customer: customerId,
       provider: selectedProvider._id,
@@ -84,7 +86,6 @@ function CustomerDashboard() {
     }
   };
 
-  // Filtering provider list
   const filteredProviders = providers.filter(provider =>
     (provider.service?.toLowerCase().includes(searchTerm.toLowerCase())) &&
     (selectedService === '' || provider.service === selectedService)
@@ -93,13 +94,32 @@ function CustomerDashboard() {
   return (
     <>
       <Navbar />
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 6 }}>
-        <Box sx={{ mb: 4 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-            <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#333' }}>
+      <Container maxWidth="lg" sx={{ mt: { xs: 2, sm: 3, md: 4 }, mb: { xs: 3, md: 6 }, px: { xs: 0.5, sm: 2 } }}>
+        {/* Header section */}
+        <Box sx={{ mb: { xs: 2, md: 4 } }}>
+          {/* Responsive heading and quick navs */}
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: { xs: 'column', sm: 'row' },
+              justifyContent: 'space-between',
+              alignItems: { xs: 'stretch', sm: 'center' },
+              mb: 3, gap: 1
+            }}
+          >
+            <Typography variant="h4" sx={{
+              fontWeight: 'bold',
+              color: '#333',
+              fontSize: { xs: 20, sm: 26, md: 30 }
+            }}>
               Find Service Providers Near You
             </Typography>
-            <Box sx={{ display: 'flex', gap: 2 }}>
+            <Box sx={{
+              display: 'flex',
+              gap: 1.5,
+              flexDirection: { xs: 'column', sm: 'row' },
+              mb: { xs: 2, sm: 0 }
+            }}>
               <Button
                 variant="outlined"
                 startIcon={<HistoryIcon />}
@@ -107,6 +127,8 @@ function CustomerDashboard() {
                 sx={{
                   borderColor: '#667eea',
                   color: '#667eea',
+                  fontSize: { xs: 13.5, sm: 15 },
+                  px: 2,
                   '&:hover': { background: '#667eea', color: 'white' }
                 }}
               >
@@ -118,6 +140,8 @@ function CustomerDashboard() {
                 sx={{
                   borderColor: '#667eea',
                   color: '#667eea',
+                  fontSize: { xs: 13.5, sm: 15 },
+                  px: 2,
                   '&:hover': { background: '#667eea', color: 'white' }
                 }}
               >
@@ -125,8 +149,8 @@ function CustomerDashboard() {
               </Button>
             </Box>
           </Box>
-
-          <Card elevation={3} sx={{ p: 3 }}>
+          {/* Search Filter Card */}
+          <Card elevation={3} sx={{ p: { xs: 1, sm: 2.2 }, boxShadow: { xs: 1, sm: 4 }, mt: 1 }}>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12} md={6}>
                 <TextField
@@ -135,13 +159,15 @@ function CustomerDashboard() {
                   variant="outlined"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
+                  size="small"
                   InputProps={{
                     startAdornment: <SearchIcon sx={{ mr: 1, color: 'gray' }} />
                   }}
+                  sx={{ fontSize: 14 }}
                 />
               </Grid>
               <Grid item xs={12} md={4}>
-                <FormControl fullWidth>
+                <FormControl fullWidth size="small">
                   <InputLabel>Filter by Service</InputLabel>
                   <Select
                     value={selectedService}
@@ -163,7 +189,9 @@ function CustomerDashboard() {
                   size="large"
                   sx={{
                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    height: '56px'
+                    height: { xs: '38px', sm: '48px' },
+                    fontWeight: 600,
+                    fontSize: { xs: 14, sm: 16 }
                   }}
                 >
                   Search
@@ -173,12 +201,13 @@ function CustomerDashboard() {
           </Card>
         </Box>
 
+        {/* Providers List Section */}
         {loading ? (
           <Typography variant="body1" sx={{ textAlign: 'center', mt: 4 }}>
             Loading providers...
           </Typography>
         ) : (
-          <Grid container spacing={3}>
+          <Grid container spacing={{ xs: 1.3, md: 2.5 }}>
             {filteredProviders.length === 0 && (
               <Grid item xs={12}>
                 <Typography variant="body1" color="text.secondary" sx={{ textAlign: "center" }}>
@@ -187,105 +216,115 @@ function CustomerDashboard() {
               </Grid>
             )}
             {filteredProviders.map((provider) => (
-              <Grid item xs={12} sm={6} md={6} key={provider._id}>
+              <Grid item xs={12} sm={6} md={4} key={provider._id}>
                 <Card
                   elevation={3}
                   sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
                     transition: 'all 0.3s',
+                    p: { xs: 1.4, sm: 2.2 },
+                    borderRadius: 3,
                     '&:hover': {
-                      transform: 'translateY(-5px)',
+                      transform: 'translateY(-6px) scale(1.022)',
                       boxShadow: 6
                     }
                   }}
                 >
-                  <CardContent>
-                    <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
-                      <Avatar
-                        sx={{
-                          width: 70,
-                          height: 70,
-                          mr: 2,
-                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                        }}
-                        src={provider.profileImage}
-                      >
-                        {provider.user?.name
-                          ? provider.user.name.split(' ').map(n => n[0]).join("")
-                          : "U"}
-                      </Avatar>
-                      <Box sx={{ flex: 1 }}>
-                        <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#333' }}>
-                          {provider.user?.name}
-                        </Typography>
-                        <Chip
-                          label={provider.service}
-                          size="small"
-                          color="primary"
-                          sx={{ mb: 1 }}
-                        />
-                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
-                          <Rating value={provider.rating || 0} precision={0.1} size="small" readOnly />
-                          <Typography variant="body2" sx={{ ml: 1, color: 'gray' }}>
-                            ({provider.rating?.toFixed(1) || "0.0"})
-                          </Typography>
-                        </Box>
-                        <Typography variant="body2" color="text.secondary">
-                          Experience: {provider.experience}
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.4 }}>
+                    <Avatar
+                      sx={{
+                        width: 50, height: 50, mr: 1.5,
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        fontSize: 20
+                      }}
+                      src={provider.profileImage}
+                    >
+                      {provider.user?.name
+                        ? provider.user.name.split(' ').map(n => n[0]).join("")
+                        : "U"}
+                    </Avatar>
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#333', fontSize: { xs: 14, sm: 16.5 } }}>
+                        {provider.user?.name}
+                      </Typography>
+                      <Chip label={provider.service} size="small" color="primary" sx={{ mb: 0.5, fontSize: 11 }} />
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Rating value={provider.rating || 0} precision={0.1} size="small" readOnly />
+                        <Typography variant="body2" sx={{ ml: 0.6, color: 'gray', fontSize: 11.5 }}>
+                          ({provider.rating?.toFixed(1) || "0.0"})
                         </Typography>
                       </Box>
                     </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                      <LocationOnIcon sx={{ fontSize: 18, color: 'gray', mr: 0.5 }} />
-                      <Typography variant="body2" color="text.secondary">
-                        {provider.city}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <PhoneIcon sx={{ fontSize: 18, color: 'gray', mr: 0.5 }} />
-                      <Typography variant="body2" color="text.secondary">
-                        {provider.phone}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#667eea' }}>
-                        ₹{provider.hourlyRate}/hr
-                      </Typography>
-                      <Box>
-                        <Button
-                          variant="outlined"
-                          onClick={() => navigate(`/reviews/${provider._id}`)}
-                          sx={{ mr: 1 }}
-                        >
-                          Reviews
-                        </Button>
-                        <Button
-                          variant="contained"
-                          onClick={() => handleBookNow(provider)}
-                          sx={{
-                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                            '&:hover': { transform: 'scale(1.05)' }
-                          }}
-                        >
-                          Book Now
-                        </Button>
-                      </Box>
-                    </Box>
-                  </CardContent>
+                  </Box>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    <b>Experience:</b> {provider.experience} yrs
+                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    <LocationOnIcon sx={{ fontSize: 17, color: 'gray', mr: 0.7 }} />
+                    <Typography variant="body2" color="text.secondary" sx={{ fontSize: 12 }}>
+                      {provider.city}
+                    </Typography>
+                    <PhoneIcon sx={{ fontSize: 17, color: 'gray', ml: 1.4, mr: 0.7 }} />
+                    <Typography variant="body2" color="text.secondary" sx={{ fontSize: 12 }}>
+                      {provider.phone}
+                    </Typography>
+                  </Box>
+                  <Typography variant="h6" sx={{ color: '#667eea', fontWeight: 'bold', fontSize: 14.7, mb: 1 }}>
+                    ₹{provider.hourlyRate}/hr
+                  </Typography>
+                  {/* Action Buttons */}
+                  <Box sx={{
+                    mt: 1, display: 'flex', gap: 1,
+                    justifyContent: { xs: "center", sm: "flex-end" }
+                  }}>
+                    <Button
+                      variant="outlined"
+                      onClick={() => navigate(`/reviews/${provider._id}`)}
+                      sx={{ fontSize: 12, py: 0.54, px: 1.6, minWidth: 64 }}
+                    >
+                      Reviews
+                    </Button>
+                    <Button
+                      variant="contained"
+                      onClick={() => handleBookNow(provider)}
+                      sx={{
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        fontSize: 12, py: 0.54, px: 1.6, minWidth: 80,
+                        '&:hover': { transform: 'scale(1.045)' }
+                      }}
+                    >
+                      Book Now
+                    </Button>
+                  </Box>
                 </Card>
               </Grid>
             ))}
           </Grid>
         )}
 
-        <Dialog open={openBooking} onClose={handleCloseBooking} maxWidth="sm" fullWidth>
-          <DialogTitle sx={{ fontWeight: 'bold', color: '#333' }}>
+        {/* Booking Dialog */}
+        <Dialog open={openBooking} onClose={handleCloseBooking} maxWidth="xs" fullWidth
+          PaperProps={{
+            sx: {
+              mx: { xs: 0.5, sm: 2 },
+              my: { xs: 2, sm: 4 },
+              px: { xs: 0.5, sm: 2 },
+              borderRadius: 3
+            }
+          }}>
+          <DialogTitle sx={{ fontWeight: 'bold', color: '#333', fontSize: { xs: 17, sm: 20 } }}>
             Confirm Booking
           </DialogTitle>
           <DialogContent>
             {selectedProvider && (
               <Box>
-                <Typography variant="body1" sx={{ mb: 2 }}>
-                  You are booking <strong>{selectedProvider.user?.name}</strong> for <strong>{selectedProvider.service}</strong> service.
+                <Typography variant="body1" sx={{ mb: 2, fontSize: { xs: 13, sm: 15 } }}>
+                  You are booking <strong>{selectedProvider.user?.name}</strong>
+                  {` for `}
+                  <strong>{selectedProvider.service}</strong> service.
                 </Typography>
                 <TextField
                   fullWidth
@@ -294,7 +333,8 @@ function CustomerDashboard() {
                   value={bookingDate}
                   onChange={(e) => setBookingDate(e.target.value)}
                   InputLabelProps={{ shrink: true }}
-                  sx={{ mb: 2 }}
+                  sx={{ mb: 1.4 }}
+                  size="small"
                 />
                 <TextField
                   fullWidth
@@ -303,7 +343,8 @@ function CustomerDashboard() {
                   value={bookingTime}
                   onChange={(e) => setBookingTime(e.target.value)}
                   InputLabelProps={{ shrink: true }}
-                  sx={{ mb: 2 }}
+                  sx={{ mb: 1.4 }}
+                  size="small"
                 />
                 <TextField
                   fullWidth
@@ -313,26 +354,30 @@ function CustomerDashboard() {
                   placeholder="Enter your address..."
                   value={bookingAddress}
                   onChange={(e) => setBookingAddress(e.target.value)}
+                  size="small"
                 />
               </Box>
             )}
           </DialogContent>
-          <DialogActions sx={{ p: 3 }}>
-            <Button onClick={handleCloseBooking} variant="outlined">
-              Cancel
-            </Button>
+          <DialogActions sx={{ p: 2, flexDirection: { xs: "column", sm: "row" }, gap: 1 }}>
+            <Button onClick={handleCloseBooking} variant="outlined" fullWidth size="medium">Cancel</Button>
             <Button
               onClick={handleConfirmBooking}
               variant="contained"
-              sx={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
+              sx={{
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                fontWeight: 600,
+                fontSize: { xs: 14, sm: 15 }
+              }}
+              fullWidth
+              size="medium"
             >
               Confirm Booking
             </Button>
           </DialogActions>
         </Dialog>
-
-        <Footer />
       </Container>
+      <Footer />
     </>
   );
 }

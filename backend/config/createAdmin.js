@@ -1,15 +1,16 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const User = require('../models/user'); 
+const User = require('../models/user');
 
-const mongoURI='mongodb+srv://mishragargi375_db_user:Gargi123@cluster0.kdoiqdv.mongodb.net/servicehub?retryWrites=true&w=majority'
+const mongoURI = 'mongodb+srv://mishragargi375_db_user:Gargi123@cluster0.kdoiqdv.mongodb.net/servicehub?retryWrites=true&w=majority'
 
 async function createAdmin() {
   try {
     await mongoose.connect(mongoURI);
 
     const email = '2023aspire194@gmail.com';
-    const password = 'gm12';
+    const password = 'gm123';
+    const Phone = '8601860318';
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const existingAdmin = await User.findOne({ email });
@@ -21,7 +22,8 @@ async function createAdmin() {
     const adminUser = new User({
       name: 'Admin User',
       email: email,
-      password: hashedPassword,
+      password: 'gm123', 
+      phone: Phone,
       role: 'admin'
     });
 

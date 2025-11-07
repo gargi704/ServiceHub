@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Box, Typography, Card, CardContent, Grid, Chip, Button, Tabs, Tab, Avatar, Divider, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import {
+  Container, Box, Typography, Card, CardContent, Grid, Chip, Button, Tabs, Tab, Avatar, Divider,
+  Dialog, DialogTitle, DialogContent, DialogActions
+} from '@mui/material';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useNavigate } from 'react-router-dom';
@@ -19,9 +22,8 @@ function ProviderServiceHistory() {
   const [allServices, setAllServices] = useState([]);
 
   useEffect(() => {
-    const providerId = localStorage.getItem('providerId'); 
+    const providerId = localStorage.getItem('providerId');
     if (!providerId) return;
-    //  console.log('ProviderId from localStorage:', providerId);
     axios.get(`${API_BASE_URL}/api/bookings/provider/${providerId}`)
       .then(res => {
         setAllServices(
@@ -84,20 +86,37 @@ function ProviderServiceHistory() {
     }
   };
 
+  // Minimal info in summary card, full in dialog!
   const ServiceCard = ({ service }) => (
-    <Card elevation={3} sx={{ mb: 3, transition: 'all 0.3s', '&:hover': { boxShadow: 6 } }}>
+    <Card
+      elevation={3}
+      sx={{
+        mb: 3,
+        transition: 'all 0.3s',
+        '&:hover': { boxShadow: 6 },
+        mx: { xs: 0, sm: 1 }
+      }}
+    >
       <CardContent>
         <Grid container spacing={2}>
-          <Grid item xs={12} md={8}>
+          <Grid item xs={12} md={10}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <Avatar sx={{ width: 60, height: 60, mr: 2, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+              <Avatar
+                sx={{
+                  width: 56,
+                  height: 56,
+                  mr: 2,
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  fontSize: { xs: 20, sm: 28 }
+                }}
+              >
                 {service.customer.charAt(0)}
               </Avatar>
               <Box>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#333' }}>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#333', fontSize: { xs: 17, md: 20 } }}>
                   {service.customer}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: 13, md: 15 } }}>
                   {service.service}
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
@@ -113,53 +132,18 @@ function ProviderServiceHistory() {
                 </Box>
               </Box>
             </Box>
-            <Divider sx={{ mb: 2 }} />
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <Typography variant="caption" color="text.secondary">Date</Typography>
-                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                  {new Date(service.date).toLocaleDateString('en-IN', {
-                    year: 'numeric', month: 'short', day: 'numeric'
-                  })}
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="caption" color="text.secondary">Time</Typography>
-                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{service.time}</Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography variant="caption" color="text.secondary">Service Location</Typography>
-                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{service.address}</Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography variant="caption" color="text.secondary">Customer Phone</Typography>
-                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{service.customerPhone}</Typography>
-              </Grid>
-            </Grid>
           </Grid>
-          <Grid item xs={12} md={4}>
-            <Box sx={{ textAlign: { xs: 'left', md: 'right' } }}>
-              <Typography variant="caption" color="text.secondary">Earnings</Typography>
-              <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#667eea', mb: 2 }}>
-                {service.amount}
-              </Typography>
-              {(service.status === 'completed' && service.customerRating) && (
-                <Box sx={{ mb: 2 }}>
-                  <Typography variant="caption" color="text.secondary">Customer Rating</Typography>
-                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#ffa726' }}>
-                    {service.customerRating} ⭐
-                  </Typography>
-                </Box>
-              )}
-              <Button
-                fullWidth
-                variant="outlined"
-                startIcon={<VisibilityIcon />}
-                onClick={() => handleViewDetails(service)}
-              >
-                View Details
-              </Button>
-            </Box>
+          <Grid item xs={12} md={2} sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
+            <Button
+              fullWidth
+              variant="outlined"
+              size="large"
+              startIcon={<VisibilityIcon />}
+              onClick={() => handleViewDetails(service)}
+              sx={{ fontSize: { xs: 13, md: 16 } }}
+            >
+              View Details
+            </Button>
           </Grid>
         </Grid>
       </CardContent>
@@ -169,61 +153,75 @@ function ProviderServiceHistory() {
   return (
     <>
       <Navbar />
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 6 }}>
+      <Container maxWidth="lg" sx={{ mt: { xs: 2, md: 4 }, mb: { xs: 4, md: 6 }, px: { xs: 1, md: 3 } }}>
         <Button
           startIcon={<ArrowBackIcon />}
           onClick={() => navigate('/provider-dashboard')}
-          sx={{ mb: 3, color: '#667eea' }}
+          sx={{ mb: { xs: 2, md: 3 }, color: '#667eea', fontSize: { xs: 14, md: 16 } }}
         >
           Back to Dashboard
         </Button>
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#333', mb: 1 }}>
+        <Box sx={{ mb: { xs: 2, md: 4 } }}>
+          <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#333', mb: 1, fontSize: { xs: 23, md: 32 } }}>
             Service History
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography variant="body1" color="text.secondary" sx={{ fontSize: { xs: 14, md: 16 } }}>
             All services you have provided to customers
           </Typography>
         </Box>
-        <Grid container spacing={3} sx={{ mb: 4 }}>
-          <Grid item xs={12} sm={6} md={3}>
-            <Card elevation={2} sx={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
-              <CardContent>
-                <Typography variant="h3" sx={{ fontWeight: 'bold' }}>{allServices.length}</Typography>
-                <Typography variant="body2">Total Services</Typography>
+        {/* Summary Cards */}
+        <Grid container spacing={2} sx={{ mb: { xs: 2, md: 4 } }}>
+          <Grid item xs={6} sm={3}>
+            <Card elevation={2}
+              sx={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white', minHeight: 98 }}>
+              <CardContent sx={{ py: 2 }}>
+                <Typography variant="h3" sx={{ fontWeight: 'bold', fontSize: { xs: 25, md: 32 } }}>{allServices.length}</Typography>
+                <Typography variant="body2" sx={{ fontSize: { xs: 13, md: 16 } }}>Total Services</Typography>
               </CardContent>
             </Card>
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Card elevation={2} sx={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', color: 'white' }}>
-              <CardContent>
-                <Typography variant="h3" sx={{ fontWeight: 'bold' }}>{completedServices.length}</Typography>
-                <Typography variant="body2">Completed</Typography>
+          <Grid item xs={6} sm={3}>
+            <Card elevation={2}
+              sx={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', color: 'white', minHeight: 98 }}>
+              <CardContent sx={{ py: 2 }}>
+                <Typography variant="h3" sx={{ fontWeight: 'bold', fontSize: { xs: 25, md: 32 } }}>{completedServices.length}</Typography>
+                <Typography variant="body2" sx={{ fontSize: { xs: 13, md: 16 } }}>Completed</Typography>
               </CardContent>
             </Card>
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Card elevation={2} sx={{ background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', color: 'white' }}>
-              <CardContent>
-                <Typography variant="h3" sx={{ fontWeight: 'bold' }}>{pendingServices.length}</Typography>
-                <Typography variant="body2">Pending</Typography>
+          <Grid item xs={6} sm={3}>
+            <Card elevation={2}
+              sx={{ background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', color: 'white', minHeight: 98 }}>
+              <CardContent sx={{ py: 2 }}>
+                <Typography variant="h3" sx={{ fontWeight: 'bold', fontSize: { xs: 25, md: 32 } }}>{pendingServices.length}</Typography>
+                <Typography variant="body2" sx={{ fontSize: { xs: 13, md: 16 } }}>Pending</Typography>
               </CardContent>
             </Card>
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Card elevation={2} sx={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', color: 'white' }}>
-              <CardContent>
-                <Typography variant="h3" sx={{ fontWeight: 'bold' }}>
+          <Grid item xs={6} sm={3}>
+            <Card elevation={2}
+              sx={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', color: 'white', minHeight: 98 }}>
+              <CardContent sx={{ py: 2 }}>
+                <Typography variant="h3" sx={{ fontWeight: 'bold', fontSize: { xs: 25, md: 32 } }}>
                   ₹{completedServices.reduce((sum, s) => sum + parseInt((s.amount || '0').replace('₹', '')), 0)}
                 </Typography>
-                <Typography variant="body2">Total Earnings</Typography>
+                <Typography variant="body2" sx={{ fontSize: { xs: 13, md: 16 } }}>Total Earnings</Typography>
               </CardContent>
             </Card>
           </Grid>
         </Grid>
+
+        {/* TABS */}
         <Card elevation={3}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs value={tabValue} onChange={handleTabChange}>
+            <Tabs
+              value={tabValue}
+              onChange={handleTabChange}
+              variant="scrollable"
+              scrollButtons
+              allowScrollButtonsMobile
+              aria-label="Service tabs"
+            >
               <Tab label={`All (${allServices.length})`} />
               <Tab label={`Completed (${completedServices.length})`} />
               <Tab label={`Pending (${pendingServices.length})`} />
@@ -231,14 +229,20 @@ function ProviderServiceHistory() {
             </Tabs>
           </Box>
         </Card>
-        <Box sx={{ mt: 3 }}>
+
+        {/* Responsive List */}
+        <Box sx={{ mt: { xs: 2, md: 3 } }}>
           {getCurrentServices().length > 0 ? (
-            getCurrentServices().map((service) => (
-              <ServiceCard key={service.id} service={service} />
-            ))
+            <Grid container spacing={2}>
+              {getCurrentServices().map((service) => (
+                <Grid item xs={12} sm={12} md={6} key={service.id}>
+                  <ServiceCard service={service} />
+                </Grid>
+              ))}
+            </Grid>
           ) : (
             <Card elevation={2}>
-              <CardContent sx={{ textAlign: 'center', py: 6 }}>
+              <CardContent sx={{ textAlign: 'center', py: { xs: 2, md: 6 } }}>
                 <Typography variant="h6" color="text.secondary">
                   No services found
                 </Typography>
@@ -247,19 +251,36 @@ function ProviderServiceHistory() {
           )}
         </Box>
       </Container>
-      <Dialog open={openDetailsDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ fontWeight: 'bold', color: '#333' }}>Service Details</DialogTitle>
+
+      {/* Responsive Dialog: Full Details as before */}
+      <Dialog
+        open={openDetailsDialog}
+        onClose={handleCloseDialog}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            mx: { xs: 1, sm: 2 },
+            my: { xs: 2, sm: 6 },
+            px: { xs: 1, sm: 2, md: 4 },
+            py: { xs: 1, sm: 2 }
+          }
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 'bold', color: '#333', fontSize: { xs: "1.1rem", md: "1.5rem" } }}>
+          Service Details
+        </DialogTitle>
         <DialogContent>
           {selectedService && (
             <Box>
               <Grid container spacing={2}>
-                <Grid item xs={6}>
+                <Grid item xs={12} sm={6}>
                   <Typography variant="caption" color="text.secondary">Service ID</Typography>
                   <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                     #{selectedService.id}
                   </Typography>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={12} sm={6}>
                   <Typography variant="caption" color="text.secondary">Status</Typography>
                   <Box>
                     <Chip
@@ -269,28 +290,28 @@ function ProviderServiceHistory() {
                     />
                   </Box>
                 </Grid>
-                <Grid item xs={12}>
-                  <Divider sx={{ my: 1 }} />
+                <Grid item xs={12} sx={{ my: { xs: 0.5, md: 1 } }}>
+                  <Divider />
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={12} sm={6}>
                   <Typography variant="caption" color="text.secondary">Customer Name</Typography>
                   <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                     {selectedService.customer}
                   </Typography>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={12} sm={6}>
                   <Typography variant="caption" color="text.secondary">Service Type</Typography>
                   <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                     {selectedService.service}
                   </Typography>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={12} sm={6}>
                   <Typography variant="caption" color="text.secondary">Date</Typography>
                   <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                     {new Date(selectedService.date).toLocaleDateString('en-IN')}
                   </Typography>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={12} sm={6}>
                   <Typography variant="caption" color="text.secondary">Time</Typography>
                   <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                     {selectedService.time}
@@ -308,12 +329,12 @@ function ProviderServiceHistory() {
                     {selectedService.customerPhone}
                   </Typography>
                 </Grid>
-                <Grid item xs={12}>
-                  <Divider sx={{ my: 1 }} />
+                <Grid item xs={12} sx={{ my: { xs: 0.5, md: 1 } }}>
+                  <Divider />
                 </Grid>
                 <Grid item xs={12}>
                   <Typography variant="caption" color="text.secondary">Earnings</Typography>
-                  <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#667eea' }}>
+                  <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#667eea', fontSize: { xs: 18, md: 22 } }}>
                     {selectedService.amount}
                   </Typography>
                 </Grid>
@@ -321,7 +342,7 @@ function ProviderServiceHistory() {
                   <Grid item xs={12}>
                     <Typography variant="caption" color="text.secondary">Customer Rating & Review</Typography>
                     <Box sx={{ mt: 1 }}>
-                      <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#ffa726' }}>
+                      <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#ffa726', fontSize: { xs: 15, md: 20 } }}>
                         {selectedService.customerRating} ⭐
                       </Typography>
                       <Typography variant="body2" sx={{ mt: 1 }}>

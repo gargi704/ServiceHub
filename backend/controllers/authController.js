@@ -17,7 +17,10 @@ exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ error: 'Invalid credentials' });
+    // if (!user) return res.status(400).json({ error: 'Invalid credentials' });
+     if (!user || user.status !== 'active') {
+      return res.status(403).json({ error: 'Account is inactive or deleted' });
+    }
 
     const isMatch = await user.comparePassword(password);
     if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });

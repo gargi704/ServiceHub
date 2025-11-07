@@ -18,7 +18,7 @@ function Login() {
     try {
       const data = await loginUser({ email, password, role });
       const loggedInUser = data.user;
-      if (loggedInUser) {
+      if (loggedInUser && data.token) {
         localStorage.setItem('userId', loggedInUser._id);
         localStorage.setItem('userName', loggedInUser.name);
         localStorage.setItem('role', loggedInUser.role);
@@ -33,7 +33,12 @@ function Login() {
         navigate('/customer-dashboard');
       }
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Login failed');
+      localStorage.clear(); 
+      if (err.response?.status === 403) {
+        toast.error('Your account is inactive or deleted. Please contact support.');
+      } else {
+        toast.error(err.response?.data?.error || 'Login failed');
+      }
     }
   };
 

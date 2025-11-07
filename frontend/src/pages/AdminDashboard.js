@@ -1,18 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Container, Box, Typography, Card, CardContent, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Chip, Button, Tabs, Tab, IconButton, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import {
+  Container, Box, Typography, Card, CardContent, Grid,
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+  Paper, Chip, Button, Tabs, Tab, IconButton, Dialog, DialogTitle,
+  DialogContent, DialogActions, Tooltip, TextField, MenuItem
+} from '@mui/material';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import PeopleIcon from '@mui/icons-material/People';
 import WorkIcon from '@mui/icons-material/Work';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import BlockIcon from '@mui/icons-material/Block';
+import RestoreIcon from '@mui/icons-material/Restore';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { API_BASE_URL } from '../api.js';  
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { API_BASE_URL } from '../api.js';
 
 function AdminDashboard() {
   const navigate = useNavigate();
@@ -28,6 +35,9 @@ function AdminDashboard() {
   const [users, setUsers] = useState([]);
   const [providers, setProviders] = useState([]);
   const [bookings, setBookings] = useState([]);
+  const [userFilter, setUserFilter] = useState('');
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null);
 
   useEffect(() => {
     const role = localStorage.getItem('role');
@@ -37,25 +47,13 @@ function AdminDashboard() {
   }, [navigate]);
 
   useEffect(() => {
-    // Fetch users
-    axios.get(`${API_BASE_URL}/api/users`)
-      .then(res => setUsers(res.data))
-      .catch(() => setUsers([]));
-    // Fetch providers
-    axios.get(`${API_BASE_URL}/api/providers`)
-      .then(res => setProviders(res.data))
-      .catch(() => setProviders([]));
-    // Fetch bookings
-    axios.get(`${API_BASE_URL}/api/bookings`)
-      .then(res => setBookings(res.data))
-      .catch(() => setBookings([]));
+    axios.get(`${API_BASE_URL}/api/users`).then(res => setUsers(res.data)).catch(() => setUsers([]));
+    axios.get(`${API_BASE_URL}/api/providers`).then(res => setProviders(res.data)).catch(() => setProviders([]));
+    axios.get(`${API_BASE_URL}/api/bookings`).then(res => setBookings(res.data)).catch(() => setBookings([]));
   }, []);
 
   useEffect(() => {
-    const revenue = bookings
-      .filter(b => b.status === 'completed')
-      .reduce((sum, b) => sum + Number(b.amount || 0), 0);
-
+    const revenue = bookings.filter(b => b.status === 'completed').reduce((sum, b) => sum + Number(b.amount || 0), 0);
     setStats({
       totalUsers: users.length,
       totalProviders: providers.length,
@@ -64,14 +62,41 @@ function AdminDashboard() {
     });
   }, [users, providers, bookings]);
 
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue);
+  const handleTabChange = (event, newValue) => setTabValue(newValue);
+
+  const handleAction = (id, type, action) => {
+    setPendingAction({ id, type, userAction: action });
+    setConfirmDialogOpen(true);
   };
 
-  const handleDelete = (id, type) => {
-    if (window.confirm(`Delete ${type} #${id}?`)) {
-      axios.delete(`${API_BASE_URL}/api/${type.toLowerCase()}s/${id}`).then(() => window.location.reload());
+  const confirmAction = async () => {
+    try {
+      if (pendingAction.type === "User") {
+        if (pendingAction.userAction === "deactivate") {
+          await axios.patch(`${API_BASE_URL}/api/users/${pendingAction.id}/status`);
+          toast.success('User deactivated!');
+          setUsers(users.map(u => u._id === pendingAction.id ? { ...u, status: 'inactive' } : u));
+        } else if (pendingAction.userAction === "reactivate") {
+          await axios.patch(`${API_BASE_URL}/api/users/${pendingAction.id}`, { status: 'active' });
+          toast.success('User reactivated!');
+          setUsers(users.map(u => u._id === pendingAction.id ? { ...u, status: 'active' } : u));
+        }
+      }
+      if (pendingAction.type === "Provider") {
+        await axios.delete(`${API_BASE_URL}/api/providers/${pendingAction.id}`);
+        toast.success(`Provider deleted!`);
+        setProviders(providers.filter(p => p._id !== pendingAction.id));
+      }
+      if (pendingAction.type === "Booking") {
+        await axios.delete(`${API_BASE_URL}/api/bookings/${pendingAction.id}`);
+        toast.success(`Booking deleted!`);
+        setBookings(bookings.filter(b => b._id !== pendingAction.id));
+      }
+    } catch (err) {
+      toast.error(`Action failed.`);
     }
+    setConfirmDialogOpen(false);
+    setPendingAction(null);
   };
 
   const handleViewDetails = (item) => {
@@ -83,107 +108,148 @@ function AdminDashboard() {
     setSelectedItem(null);
   };
 
+  const filteredUsers = users.filter(user => (userFilter === '' || user.status === userFilter));
+
   return (
     <>
       <Navbar />
-      <Container maxWidth="xl" sx={{ mt: 4, mb: 6 }}>
-        {/* Header */}
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#333', mb: 1 }}>
+      <ToastContainer position="top-right" />
+      <Container maxWidth="xl" sx={{ mt: { xs: 2, md: 4 }, mb: { xs: 3, md: 6 }, px: { xs: 0.5, sm: 2 } }}>
+        <Box sx={{ mb: { xs: 2, md: 4 } }}>
+          <Typography variant="h4" sx={{
+            fontWeight: 'bold',
+            color: '#333',
+            mb: 1,
+            fontSize: { xs: 22, sm: 28, md: 30 }
+          }}>
             Admin Dashboard
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography variant="body1" color="text.secondary" sx={{ fontSize: { xs: 14, sm: 16 } }}>
             Manage your entire platform from here
           </Typography>
         </Box>
 
-        {/* Stats Cards */}
-        <Grid container spacing={3} sx={{ mb: 4 }}>
+        {/* Summary Cards */}
+        <Grid container spacing={{ xs: 2, md: 3 }} sx={{ mb: { xs: 2, md: 4 } }}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card elevation={3} sx={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
-              <CardContent>
+            <Card elevation={3} sx={{
+              background: 'linear-gradient(135deg,#667eea 0%,#764ba2 100%)',
+              color: 'white', borderRadius: 3, p: { xs: 1.5, md: 2 }
+            }}>
+              <CardContent sx={{ p: { xs: 1, md: 2 } }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Box>
-                    <Typography variant="h3" sx={{ fontWeight: 'bold' }}>{stats.totalUsers}</Typography>
-                    <Typography variant="body2">Total Users</Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 'bold', fontSize: { xs: 18, sm: 24, md: 30 } }}>{stats.totalUsers}</Typography>
+                    <Typography variant="body2" sx={{ fontSize: { xs: 13, sm: 15 } }}>Total Users</Typography>
                   </Box>
-                  <PeopleIcon sx={{ fontSize: 60, opacity: 0.8 }} />
+                  <PeopleIcon sx={{ fontSize: 38, opacity: 0.8 }} />
                 </Box>
               </CardContent>
             </Card>
           </Grid>
-
           <Grid item xs={12} sm={6} md={3}>
-            <Card elevation={3} sx={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', color: 'white' }}>
-              <CardContent>
+            <Card elevation={3} sx={{
+              background: 'linear-gradient(135deg,#f093fb 0%,#f5576c 100%)',
+              color: 'white', borderRadius: 3, p: { xs: 1.5, md: 2 }
+            }}>
+              <CardContent sx={{ p: { xs: 1, md: 2 } }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Box>
-                    <Typography variant="h3" sx={{ fontWeight: 'bold' }}>{stats.totalProviders}</Typography>
-                    <Typography variant="body2">Total Providers</Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 'bold', fontSize: { xs: 18, sm: 24, md: 30 } }}>{stats.totalProviders}</Typography>
+                    <Typography variant="body2" sx={{ fontSize: { xs: 13, sm: 15 } }}>Total Providers</Typography>
                   </Box>
-                  <WorkIcon sx={{ fontSize: 60, opacity: 0.8 }} />
+                  <WorkIcon sx={{ fontSize: 38, opacity: 0.8 }} />
                 </Box>
               </CardContent>
             </Card>
           </Grid>
-
           <Grid item xs={12} sm={6} md={3}>
-            <Card elevation={3} sx={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', color: 'white' }}>
-              <CardContent>
+            <Card elevation={3} sx={{
+              background: 'linear-gradient(135deg,#4facfe 0%,#00f2fe 100%)',
+              color: 'white', borderRadius: 3, p: { xs: 1.5, md: 2 }
+            }}>
+              <CardContent sx={{ p: { xs: 1, md: 2 } }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Box>
-                    <Typography variant="h3" sx={{ fontWeight: 'bold' }}>{stats.totalBookings}</Typography>
-                    <Typography variant="body2">Total Bookings</Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 'bold', fontSize: { xs: 18, sm: 24, md: 30 } }}>{stats.totalBookings}</Typography>
+                    <Typography variant="body2" sx={{ fontSize: { xs: 13, sm: 15 } }}>Total Bookings</Typography>
                   </Box>
-                  <DashboardIcon sx={{ fontSize: 60, opacity: 0.8 }} />
+                  <DashboardIcon sx={{ fontSize: 38, opacity: 0.8 }} />
                 </Box>
               </CardContent>
             </Card>
           </Grid>
-
           <Grid item xs={12} sm={6} md={3}>
-            <Card elevation={3} sx={{ background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', color: 'white' }}>
-              <CardContent>
+            <Card elevation={3} sx={{
+              background: 'linear-gradient(135deg,#fa709a 0%,#fee140 100%)',
+              color: 'white', borderRadius: 3, p: { xs: 1.5, md: 2 }
+            }}>
+              <CardContent sx={{ p: { xs: 1, md: 2 } }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Box>
-                    <Typography variant="h3" sx={{ fontWeight: 'bold' }}>{stats.revenue}</Typography>
-                    <Typography variant="body2">Total Revenue</Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 'bold', fontSize: { xs: 18, sm: 24, md: 30 } }}>{stats.revenue}</Typography>
+                    <Typography variant="body2" sx={{ fontSize: { xs: 13, sm: 15 } }}>Total Revenue</Typography>
                   </Box>
-                  <AttachMoneyIcon sx={{ fontSize: 60, opacity: 0.8 }} />
+                  <AttachMoneyIcon sx={{ fontSize: 38, opacity: 0.8 }} />
                 </Box>
               </CardContent>
             </Card>
           </Grid>
         </Grid>
 
-        {/* Tabs and Tables */}
         <Card elevation={3}>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs value={tabValue} onChange={handleTabChange}>
+          <Box sx={{
+            borderBottom: 1, borderColor: 'divider',
+            display: 'flex', alignItems: { xs: "stretch", sm: "center" }, flexDirection: { xs: "column", sm: "row" }, p: 2
+          }}>
+            <Tabs
+              value={tabValue}
+              onChange={handleTabChange}
+              variant="scrollable"
+              scrollButtons="auto"
+              sx={{
+                minHeight: "36px",
+                '& .MuiTab-root': { fontSize: { xs: 14, sm: 16 } }
+              }}>
               <Tab label="Users" />
               <Tab label="Providers" />
               <Tab label="Bookings" />
             </Tabs>
-          </Box>
-          <CardContent>
-            {/* Users Table */}
             {tabValue === 0 && (
-              <TableContainer component={Paper} elevation={0}>
-                <Table>
+              <Box sx={{ ml: { xs: 0, sm: 2 }, mt: { xs: 2, sm: 0 }, width: "auto" }}>
+                <TextField
+                  select
+                  value={userFilter}
+                  onChange={e => setUserFilter(e.target.value)}
+                  label="Filter by Status"
+                  size="small"
+                  sx={{ minWidth: 120 }}
+                >
+                  <MenuItem value="">All</MenuItem>
+                  <MenuItem value="active">Active</MenuItem>
+                  <MenuItem value="inactive">Inactive</MenuItem>
+                </TextField>
+              </Box>
+            )}
+          </Box>
+          <CardContent sx={{ px: { xs: 0, sm: 2 } }}>
+            {tabValue === 0 && (
+              <TableContainer component={Paper} elevation={0} sx={{ width: '100%', overflowX: 'auto' }}>
+                <Table size="small" sx={{ minWidth: 600 }}>
                   <TableHead>
-                    <TableRow sx={{ background: '#f5f5f5' }}>
-                      <TableCell sx={{ fontWeight: 'bold' }}>ID</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Email</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Phone</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Join Date</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 'bold', fontSize: { xs: 13, sm: 15 } }}>ID</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', fontSize: { xs: 13, sm: 15 } }}>Name</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', fontSize: { xs: 13, sm: 15 } }}>Email</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', fontSize: { xs: 13, sm: 15 } }}>Phone</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', fontSize: { xs: 13, sm: 15 } }}>Join Date</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', fontSize: { xs: 13, sm: 15 } }}>Status</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', fontSize: { xs: 13, sm: 15 } }}>Actions</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {users.map((user) => (
-                      <TableRow key={user._id} hover>
+                    {filteredUsers.map((user) => (
+                      <TableRow key={user._id} hover sx={{ opacity: user.status === "active" ? 1 : 0.6 }}>
                         <TableCell>#{user._id}</TableCell>
                         <TableCell>{user.name}</TableCell>
                         <TableCell>{user.email}</TableCell>
@@ -191,18 +257,35 @@ function AdminDashboard() {
                         <TableCell>{user.createdAt ? user.createdAt.slice(0, 10) : '-'}</TableCell>
                         <TableCell>
                           <Chip
-                            label={user.status || "inactive"}
-                            color={user.status === 'active' ? 'success' : 'default'}
+                            label={user.status}
+                            color={user.status === "active" ? "success" : "default"}
                             size="small"
+                            sx={{
+                              textTransform: 'lowercase',
+                              fontWeight: 'normal',
+                              fontSize: { xs: 13, sm: 15 }
+                            }}
                           />
                         </TableCell>
                         <TableCell>
-                          <IconButton size="small" color="primary" onClick={() => handleViewDetails(user)}>
-                            <VisibilityIcon />
-                          </IconButton>
-                          <IconButton size="small" color="error" onClick={() => handleDelete(user._id, 'User')}>
-                            <DeleteIcon />
-                          </IconButton>
+                          <Tooltip title="View Details">
+                            <IconButton size="small" color="primary" onClick={() => handleViewDetails(user)}>
+                              <VisibilityIcon />
+                            </IconButton>
+                          </Tooltip>
+                          {user.status === 'active' ? (
+                            <Tooltip title="Deactivate User">
+                              <IconButton size="small" color="warning" onClick={() => handleAction(user._id, 'User', 'deactivate')}>
+                                <BlockIcon />
+                              </IconButton>
+                            </Tooltip>
+                          ) : (
+                            <Tooltip title="Reactivate User">
+                              <IconButton size="small" color="success" onClick={() => handleAction(user._id, 'User', 'reactivate')}>
+                                <RestoreIcon />
+                              </IconButton>
+                            </Tooltip>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -211,19 +294,18 @@ function AdminDashboard() {
               </TableContainer>
             )}
 
-            {/* Providers Table */}
             {tabValue === 1 && (
-              <TableContainer component={Paper} elevation={0}>
-                <Table>
+              <TableContainer component={Paper} elevation={0} sx={{ width: '100%', overflowX: 'auto' }}>
+                <Table size="small" sx={{ minWidth: 600 }}>
                   <TableHead>
-                    <TableRow sx={{ background: '#f5f5f5' }}>
-                      <TableCell sx={{ fontWeight: 'bold' }}>ID</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Service</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Phone</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Rating</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 'bold', fontSize: { xs: 13, sm: 15 } }}>ID</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', fontSize: { xs: 13, sm: 15 } }}>Name</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', fontSize: { xs: 13, sm: 15 } }}>Service</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', fontSize: { xs: 13, sm: 15 } }}>Phone</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', fontSize: { xs: 13, sm: 15 } }}>Rating</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', fontSize: { xs: 13, sm: 15 } }}>Status</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', fontSize: { xs: 13, sm: 15 } }}>Actions</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -239,15 +321,20 @@ function AdminDashboard() {
                             label={provider.status || "pending"}
                             color={provider.status === 'approved' ? 'success' : 'warning'}
                             size="small"
+                            sx={{ fontSize: { xs: 13, sm: 15 } }}
                           />
                         </TableCell>
                         <TableCell>
-                          <IconButton size="small" color="primary" onClick={() => handleViewDetails(provider)}>
-                            <VisibilityIcon />
-                          </IconButton>
-                          <IconButton size="small" color="error" onClick={() => handleDelete(provider._id, 'Provider')}>
-                            <DeleteIcon />
-                          </IconButton>
+                          <Tooltip title="View Details">
+                            <IconButton size="small" color="primary" onClick={() => handleViewDetails(provider)}>
+                              <VisibilityIcon />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Delete Provider">
+                            <IconButton size="small" color="error" onClick={() => handleAction(provider._id, 'Provider', 'delete')}>
+                              <DeleteIcon />
+                            </IconButton>
+                          </Tooltip>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -256,20 +343,19 @@ function AdminDashboard() {
               </TableContainer>
             )}
 
-            {/* Bookings Table */}
             {tabValue === 2 && (
-              <TableContainer component={Paper} elevation={0}>
-                <Table>
+              <TableContainer component={Paper} elevation={0} sx={{ width: '100%', overflowX: 'auto' }}>
+                <Table size="small" sx={{ minWidth: 700 }}>
                   <TableHead>
-                    <TableRow sx={{ background: '#f5f5f5' }}>
-                      <TableCell sx={{ fontWeight: 'bold' }}>ID</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Customer</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Provider</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Service</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Date</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Amount</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 'bold', fontSize: { xs: 13, sm: 15 } }}>ID</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', fontSize: { xs: 13, sm: 15 } }}>Customer</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', fontSize: { xs: 13, sm: 15 } }}>Provider</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', fontSize: { xs: 13, sm: 15 } }}>Service</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', fontSize: { xs: 13, sm: 15 } }}>Date</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', fontSize: { xs: 13, sm: 15 } }}>Amount</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', fontSize: { xs: 13, sm: 15 } }}>Status</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', fontSize: { xs: 13, sm: 15 } }}>Actions</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -280,7 +366,7 @@ function AdminDashboard() {
                         <TableCell>{booking.provider?.user?.name || '-'}</TableCell>
                         <TableCell>{booking.service}</TableCell>
                         <TableCell>{booking.date ? booking.date.slice(0, 10) : '-'}</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold', color: '#667eea' }}>
+                        <TableCell sx={{ fontWeight: 'bold', color: '#667eea', fontSize: { xs: 13, sm: 15 } }}>
                           ₹{booking.amount}
                         </TableCell>
                         <TableCell>
@@ -288,12 +374,20 @@ function AdminDashboard() {
                             label={booking.status}
                             color={booking.status === 'completed' ? 'success' : 'warning'}
                             size="small"
+                            sx={{ fontSize: { xs: 13, sm: 15 } }}
                           />
                         </TableCell>
                         <TableCell>
-                          <IconButton size="small" color="primary" onClick={() => handleViewDetails(booking)}>
-                            <VisibilityIcon />
-                          </IconButton>
+                          <Tooltip title="View Details">
+                            <IconButton size="small" color="primary" onClick={() => handleViewDetails(booking)}>
+                              <VisibilityIcon />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Delete Booking">
+                            <IconButton size="small" color="error" onClick={() => handleAction(booking._id, 'Booking', 'delete')}>
+                              <DeleteIcon />
+                            </IconButton>
+                          </Tooltip>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -303,19 +397,52 @@ function AdminDashboard() {
             )}
           </CardContent>
         </Card>
-      </Container>
 
-      {/* Details Dialog */}
-      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ fontWeight: 'bold', color: '#333' }}>Details</DialogTitle>
-        <DialogContent>
-          {selectedItem && (<Box><pre>{JSON.stringify(selectedItem, null, 2)}</pre></Box>)}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog} variant="contained">Close</Button>
-        </DialogActions>
-      </Dialog>
-      <Footer />
+        {/* Details Dialog */}
+        <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+          <DialogTitle sx={{ fontWeight: 'bold', color: '#333' }}>Details</DialogTitle>
+          <DialogContent>
+            {selectedItem && (<Box><pre style={{ fontSize: 14 }}>{JSON.stringify(selectedItem, null, 2)}</pre></Box>)}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog} variant="contained">Close</Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Confirmation Dialog for action */}
+        <Dialog open={confirmDialogOpen} onClose={() => setConfirmDialogOpen(false)}>
+          <DialogTitle>
+            {pendingAction?.type === "User" && pendingAction?.userAction === "deactivate" && "Deactivate User"}
+            {pendingAction?.type === "User" && pendingAction?.userAction === "reactivate" && "Reactivate User"}
+            {pendingAction?.type !== "User" && "Delete"}
+          </DialogTitle>
+          <DialogContent>
+            <Typography sx={{ fontSize: { xs: 14, sm: 16 } }}>
+              {pendingAction?.type === "User" && pendingAction?.userAction === "deactivate" &&
+                "Are you sure you want to deactivate this user? User will lose all access but data will be preserved."
+              }
+              {pendingAction?.type === "User" && pendingAction?.userAction === "reactivate" &&
+                "Are you sure to reactivate this user? User will get platform access again."
+              }
+              {pendingAction?.type !== "User" &&
+                `Delete ${pendingAction?.type} #${pendingAction?.id}? This action cannot be undone.`
+              }
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setConfirmDialogOpen(false)}>Cancel</Button>
+            <Button onClick={confirmAction} variant="contained"
+              color={pendingAction?.type === "User" && pendingAction?.userAction === "reactivate" ? "success" : "error"}>
+              {pendingAction?.type === "User" && pendingAction?.userAction === "reactivate"
+                ? "Reactivate"
+                : pendingAction?.type === "User" && pendingAction?.userAction === "deactivate"
+                  ? "Deactivate"
+                  : "Delete"}
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Footer />
+      </Container>
     </>
   );
 }
