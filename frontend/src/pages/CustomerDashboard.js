@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Box, Typography, Card, CardContent, Grid, TextField, Button, Chip, Avatar, Rating, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { Container, Box, Typography, Card, Grid, TextField, Button, Chip, Avatar, Rating, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import SearchIcon from '@mui/icons-material/Search';

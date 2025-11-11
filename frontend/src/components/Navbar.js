@@ -4,8 +4,8 @@ import MenuIcon from '@mui/icons-material/Menu';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Select, MenuItem } from '@mui/material';
-import LanguageIcon from '@mui/icons-material/Language';
+// import { Select, MenuItem } from '@mui/material';
+// import LanguageIcon from '@mui/icons-material/Language';
 
 function Navbar({ scrollToServices }) {
   const [mobileOpen, setMobileOpen] = useState(false);

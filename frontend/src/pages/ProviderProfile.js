@@ -15,7 +15,7 @@ import { IMAGE_SERVER } from '../api';
 import { useTranslation } from 'react-i18next';
 
 function ProviderProfile() {
-   const { t, i18n } = useTranslation();
+   const { t } = useTranslation();
   const navigate = useNavigate();
   const userId = localStorage.getItem('userId');
   // console.log("ProviderProfile loaded. userId in localStorage =", userId);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Box, Typography, Card, CardContent, Grid, Chip, Button, Tabs, Tab, Avatar, Divider, Dialog, DialogTitle, DialogContent, DialogActions, Rating } from '@mui/material';
+import { Container, Box, Typography, Card, CardContent, Grid, Chip, Button, Tabs, Tab, Avatar, Divider, Dialog, DialogContent, Rating } from '@mui/material';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
