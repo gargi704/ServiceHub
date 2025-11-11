@@ -4,8 +4,11 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import EmailIcon from '@mui/icons-material/Email';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
+import { useTranslation } from 'react-i18next';
+
 
 function Footer() {
+  const { t } = useTranslation();
   return (
     <Box sx={{
       background: '#333', color: 'white', textAlign: 'center',
@@ -54,12 +57,12 @@ function Footer() {
             underline="always"
             sx={{ fontWeight: 600, fontSize: { xs: 15, sm: 16 } }}
           >
-            Need Help?
+           {t('needHelp')}
           </MuiLink>
         </Box>
       </Stack>
       <Typography variant="body2" sx={{ mt: 1, fontSize: { xs: 13, sm: 15 } }}>
-        &copy; {new Date().getFullYear()} ServiceHub. All rights reserved.
+        &copy; {new Date().getFullYear()} ServiceHub.{t('allRightsReserved')}
       </Typography>
     </Box>
   );

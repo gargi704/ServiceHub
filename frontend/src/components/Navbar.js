@@ -3,6 +3,9 @@ import { AppBar, Toolbar, Typography, Button, Box, IconButton, Drawer, List, Lis
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Select, MenuItem } from '@mui/material';
+import LanguageIcon from '@mui/icons-material/Language';
 
 function Navbar({ scrollToServices }) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -10,6 +13,8 @@ function Navbar({ scrollToServices }) {
   const location = useLocation();
   const isLoggedIn = !!localStorage.getItem("userId");
   const userRole = localStorage.getItem("role");
+
+  const { t, i18n } = useTranslation();
 
   const handleLogout = () => {
     localStorage.clear();
@@ -43,12 +48,12 @@ function Navbar({ scrollToServices }) {
       : []),
     ...(!isLoggedIn
       ? [
-          { text: "Login", to: "/login" },
-          { text: "Register", to: "/register", contained: true }
-        ]
+        { text: "Login", to: "/login" },
+        { text: "Register", to: "/register", contained: true }
+      ]
       : [
-          { text: "Logout", onClick: handleLogout }
-        ])
+        { text: "Logout", onClick: handleLogout }
+      ])
   ];
 
   return (
@@ -71,20 +76,20 @@ function Navbar({ scrollToServices }) {
           </Typography>
           {/* Desktop menu */}
           <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: 'center', gap: 1 }}>
-            <Button color="inherit" component={Link} to="/" sx={{ fontWeight: 600 }}>Home</Button>
-            <Button color="inherit" onClick={handleServicesClick} sx={{ fontWeight: 600 }}>Services</Button>
+            <Button color="inherit" component={Link} to="/" sx={{ fontWeight: 600 }}>{t('home')}</Button>
+            <Button color="inherit" onClick={handleServicesClick} sx={{ fontWeight: 600 }}>{t('services')}</Button>
             {isLoggedIn && (userRole === "customer" || userRole === "admin") && (
-              <Button color="inherit" component={Link} to="/customer-dashboard" sx={{ fontWeight: 600 }}>Customer</Button>
+              <Button color="inherit" component={Link} to="/customer-dashboard" sx={{ fontWeight: 600 }}>{t('customer')}</Button>
             )}
             {isLoggedIn && (userRole === "provider" || userRole === "admin") && (
-              <Button color="inherit" component={Link} to="/provider-dashboard" sx={{ fontWeight: 600 }}>Provider</Button>
+              <Button color="inherit" component={Link} to="/provider-dashboard" sx={{ fontWeight: 600 }}>{t('provider')}</Button>
             )}
             {isLoggedIn && userRole === "admin" && (
-              <Button color="inherit" component={Link} to="/admin-dashboard" sx={{ fontWeight: 600 }}>Admin</Button>
+              <Button color="inherit" component={Link} to="/admin-dashboard" sx={{ fontWeight: 600 }}>{t('admin')}</Button>
             )}
             {!isLoggedIn && (
               <>
-                <Button color="inherit" component={Link} to="/login" sx={{ fontWeight: 600 }}>Login</Button>
+                <Button color="inherit" component={Link} to="/login" sx={{ fontWeight: 600 }}>{t('login')}</Button>
                 <Button
                   variant="contained"
                   component={Link}
@@ -100,8 +105,14 @@ function Navbar({ scrollToServices }) {
               </>
             )}
             {isLoggedIn && (
-              <Button color="inherit" onClick={handleLogout} sx={{ fontWeight: 600 }}>Logout</Button>
+              <Button color="inherit" onClick={handleLogout} sx={{ fontWeight: 600 }}>{t('logout')}</Button>
             )}
+            <Box sx={{ ml: 2 }}>
+              <Button color="inherit" size="small" onClick={() => i18n.changeLanguage(i18n.language === 'en' ? 'hi' : 'en')}>
+                {i18n.language === 'en' ? 'हिंदी' : 'EN'}
+              </Button>
+            </Box>
+
           </Box>
         </Toolbar>
       </AppBar>

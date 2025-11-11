@@ -3,18 +3,20 @@ import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import ScheduleSendIcon from '@mui/icons-material/ScheduleSend';
 import MoneyOffIcon from '@mui/icons-material/MoneyOff';
 import LockIcon from '@mui/icons-material/Lock';
+import { useTranslation } from 'react-i18next';
 
 function WhyChooseUs() {
+  const { t } = useTranslation();
   const items = [
-    { icon: <VerifiedUserIcon sx={{ fontSize: 40, color: '#667eea' }} />, label: "Verified Providers", desc: "All professionals are background checked and trusted." },
-    { icon: <ScheduleSendIcon sx={{ fontSize: 40, color: '#667eea' }} />, label: "Quick Booking", desc: "Book in seconds, get service at your convenience." },
-    { icon: <LockIcon sx={{ fontSize: 40, color: '#667eea' }} />, label: "Secure Payments", desc: "100% safe, encrypted transactions." },
-    { icon: <MoneyOffIcon sx={{ fontSize: 40, color: '#667eea' }} />, label: "Transparent Pricing", desc: "No hidden charges. Get quotes instantly." },
+    { icon: <VerifiedUserIcon sx={{ fontSize: 40, color: '#667eea' }} />, label: t('verifiedProviders'), desc: t('verifiedProvidersDesc') },
+    { icon: <ScheduleSendIcon sx={{ fontSize: 40, color: '#667eea' }} />, label: t('quickBooking'), desc: t('quickBookingDesc') },
+    { icon: <LockIcon sx={{ fontSize: 40, color: '#667eea' }} />, label: t('securePayments'), desc: t('securePaymentsDesc') },
+    { icon: <MoneyOffIcon sx={{ fontSize: 40, color: '#667eea' }} />, label: t('transparentPricing'), desc: t('transparentPricingDesc') },
   ];
   return (
     <Container sx={{ py: 6 }}>
       <Typography variant="h4" align="center" sx={{ fontWeight: 'bold', mb: 4, color: '#333' }}>
-        Why Choose ServiceHub?
+       {t('whyChooseServiceHub')}
       </Typography>
       <Grid container spacing={4} justifyContent="center">
         {items.map((item, idx) => (

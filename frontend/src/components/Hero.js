@@ -1,8 +1,10 @@
 import React from 'react';
 import { Box, Typography, TextField, Button, Container } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import { useTranslation } from 'react-i18next';
 
 function Hero({searchQuery, setSearchQuery}) {
+  const { t } = useTranslation();
   return (
     <Box
       sx={{
@@ -21,17 +23,17 @@ function Hero({searchQuery, setSearchQuery}) {
             animation: 'fadeInDown 1s'
           }}
         >
-          Find Trusted Workers Near You
+          {t('findTrustedWorkers')}
         </Typography>
         <Typography variant="h5" sx={{ mb: 4, animation: 'fadeInUp 1s' }}>
-          Electricians, Plumbers, Laborers & More
+          {t('workerList')}
         </Typography>
         <Box sx={{ display: 'flex', gap: 2, animation: 'fadeIn 1.5s' }}>
           <TextField
             fullWidth
             autoFocus   
             variant="outlined"
-            placeholder="Search for services..."
+            placeholder={t('searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             sx={{
@@ -58,7 +60,7 @@ function Hero({searchQuery, setSearchQuery}) {
               }
             }}
           >
-            Search
+            {t('search')}
           </Button>
         </Box>
       </Container>

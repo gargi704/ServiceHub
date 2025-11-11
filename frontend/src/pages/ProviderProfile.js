@@ -12,8 +12,10 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API_BASE_URL } from '../api';
 import { IMAGE_SERVER } from '../api';
+import { useTranslation } from 'react-i18next';
 
 function ProviderProfile() {
+   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const userId = localStorage.getItem('userId');
   // console.log("ProviderProfile loaded. userId in localStorage =", userId);
@@ -174,13 +176,13 @@ function ProviderProfile() {
     }
   };
 
-  if (!loaded) return <div>Loading...</div>;
+  if (!loaded) return <div>{t('loading...')}</div>;
 
   return (
     <>
       <Navbar />
       <Container maxWidth="lg" sx={{ mt: 4, mb: 6 }}>
-        {showSuccess && <Alert severity="success" sx={{ mb: 3 }}>Profile saved successfully!</Alert>}
+        {showSuccess && <Alert severity="success" sx={{ mb: 3 }}>{t('profileSavedSuccessfully!')}</Alert>}
         <Card elevation={3} sx={{ mb: 4 }}>
           <CardContent>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -227,12 +229,12 @@ function ProviderProfile() {
                   <Chip icon={<VerifiedIcon />} label="Verified" color="success" size="small" />
                 </Box>
                 <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
-                  {profile.service || 'Service'} • {profile.experience ? `${profile.experience}+ years experience` : ''}
+                  {profile.service || t('service')} • {profile.experience ? `${profile.experience}+ ${t('yearsExperience')}` : ''}
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                   <Rating value={reviewStats.average || 0} precision={0.1} readOnly size="small" />
                   <Typography variant="body2" sx={{ ml: 1, color: 'text.secondary' }}>
-                    ({reviewStats.average} from {reviewStats.total} reviews)
+                    ({reviewStats.average} {t('from')} {reviewStats.total} {t('reviews')})
                   </Typography>
                 </Box>
               </Box>
@@ -254,12 +256,12 @@ function ProviderProfile() {
             <Card elevation={3} sx={{ mb: 3 }}>
               <CardContent>
                 <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2, color: '#333' }}>
-                  Professional Information
+                 {t('professionalInformation')}
                 </Typography>
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={6}>
                     <TextField
-                      label="Full Name"
+                      label= {t('fullName')}
                       name="name"
                       fullWidth
                       value={profile.user?.name || ""}
@@ -269,7 +271,7 @@ function ProviderProfile() {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <TextField
-                      label="Service Type"
+                      label={t('serviceType')}
                       name="service"
                       fullWidth
                       value={profile.service || ""}
@@ -279,7 +281,7 @@ function ProviderProfile() {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <TextField
-                      label="Years of Experience"
+                      label={t('yearsOfExperience')}
                       name="experience"
                       fullWidth
                       value={profile.experience || ""}
@@ -289,7 +291,7 @@ function ProviderProfile() {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <TextField
-                      label="Hourly Rate (₹)"
+                      label={t('hourlyRate (₹)')}
                       name="hourlyRate"
                       fullWidth
                       value={profile.hourlyRate || ""}
@@ -299,7 +301,7 @@ function ProviderProfile() {
                   </Grid>
                   <Grid item xs={12}>
                     <TextField
-                      label="Skills"
+                      label={t('skills')}
                       name="skills"
                       fullWidth
                       value={profile.skills || ""}
@@ -310,7 +312,7 @@ function ProviderProfile() {
                   </Grid>
                   <Grid item xs={12}>
                     <TextField
-                      label="About Me"
+                      label={t('aboutMe')}
                       name="description"
                       fullWidth
                       multiline
@@ -328,11 +330,11 @@ function ProviderProfile() {
           <Grid item xs={12} md={6}>
             <Card elevation={3} sx={{ mb: 3 }}>
               <CardContent>
-                <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2, color: '#333' }}>Contact Information</Typography>
+                <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2, color: '#333' }}>{t('contactInformation')}</Typography>
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={6}>
                     <TextField
-                      label="Email Address"
+                      label={t('emailAddress')}
                       name="email"
                       fullWidth
                       value={profile.email || ""}
@@ -342,7 +344,7 @@ function ProviderProfile() {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <TextField
-                      label="Phone Number"
+                      label={t('phoneNumber')}
                       name="phone"
                       fullWidth
                       value={profile.phone || ""}
@@ -352,7 +354,7 @@ function ProviderProfile() {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <TextField
-                      label="City"
+                      label={t('city')}
                       name="city"
                       fullWidth
                       value={profile.city || ""}
@@ -362,7 +364,7 @@ function ProviderProfile() {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <TextField
-                      label="State"
+                      label={t('state')}
                       name="state"
                       fullWidth
                       value={profile.state || ""}
@@ -372,7 +374,7 @@ function ProviderProfile() {
                   </Grid>
                   <Grid item xs={12}>
                     <TextField
-                      label="Address"
+                      label={t('address')}
                       name="address"
                       fullWidth
                       value={profile.address || ""}
@@ -389,11 +391,11 @@ function ProviderProfile() {
             <Card elevation={3} sx={{ mb: 3 }}>
               <CardContent>
                 <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2, color: '#333' }}>
-                  Performance Stats
+                  {t('performanceStats')}
                 </Typography>
                 <Grid container spacing={3}>
                   <Grid item xs={12} sm={4}>
-                    <Typography variant="body2" color="text.secondary">Total Jobs</Typography>
+                    <Typography variant="body2" color="text.secondary">{t('totalJobs')}</Typography>
                     <TextField
                       name="totalJobs"
                       variant="standard"
@@ -405,7 +407,7 @@ function ProviderProfile() {
                     />
                   </Grid>
                   <Grid item xs={12} sm={4}>
-                    <Typography variant="body2" color="text.secondary">Completed</Typography>
+                    <Typography variant="body2" color="text.secondary">{t('completed')}</Typography>
                     <TextField
                       name="completedJobs"
                       variant="standard"
@@ -417,7 +419,7 @@ function ProviderProfile() {
                     />
                   </Grid>
                   <Grid item xs={12} sm={4}>
-                    <Typography variant="body2" color="text.secondary">Total Earnings</Typography>
+                    <Typography variant="body2" color="text.secondary">{t('totalEarnings')}</Typography>
                     <TextField
                       name="earnings"
                       variant="standard"
@@ -436,12 +438,12 @@ function ProviderProfile() {
           <Grid item xs={12} md={4}>
             <Card elevation={3} sx={{ mb: 3 }}>
               <CardContent>
-                <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2, color: '#333' }}>Quick Actions</Typography>
+                <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2, color: '#333' }}>{t('quickActions')}</Typography>
                 <Button
                   fullWidth variant="outlined" sx={{ mb: 2, bgcolor: "#e9efff" }}
                   onClick={() => navigate(`/reviews/${profile._id}`)}
                   disabled={!profile._id}
-                >VIEW YOUR REVIEWS</Button>
+                >{t('viewYourReviews')}</Button>
                 {/* <Button fullWidth variant="outlined" sx={{ mb: 2 }} component="label">
                   UPLOAD ID PROOF
                   <input hidden type="file" accept="image/*" onChange={handleUpload('idProof')} />

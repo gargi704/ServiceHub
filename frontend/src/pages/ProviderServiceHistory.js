@@ -13,8 +13,11 @@ import PendingIcon from '@mui/icons-material/Pending';
 import CancelIcon from '@mui/icons-material/Cancel';
 import axios from 'axios';
 import { API_BASE_URL } from '../api.js';
+import { useTranslation } from 'react-i18next';
+
 
 function ProviderServiceHistory() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [tabValue, setTabValue] = useState(0);
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
@@ -127,7 +130,7 @@ function ProviderServiceHistory() {
                     size="small"
                   />
                   <Typography variant="caption" color="text.secondary" sx={{ ml: 2 }}>
-                    Service ID: #{service.id}
+                    {t('serviceId')}: #{service.id}
                   </Typography>
                 </Box>
               </Box>
@@ -142,7 +145,7 @@ function ProviderServiceHistory() {
               onClick={() => handleViewDetails(service)}
               sx={{ fontSize: { xs: 13, md: 16 } }}
             >
-              View Details
+              {t('viewDetails')}
             </Button>
           </Grid>
         </Grid>
@@ -159,14 +162,14 @@ function ProviderServiceHistory() {
           onClick={() => navigate('/provider-dashboard')}
           sx={{ mb: { xs: 2, md: 3 }, color: '#667eea', fontSize: { xs: 14, md: 16 } }}
         >
-          Back to Dashboard
+          {t('backToDashboard')}
         </Button>
         <Box sx={{ mb: { xs: 2, md: 4 } }}>
           <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#333', mb: 1, fontSize: { xs: 23, md: 32 } }}>
-            Service History
+            {t('serviceHistory')}
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ fontSize: { xs: 14, md: 16 } }}>
-            All services you have provided to customers
+            {t('allServicesYouHaveProvided')}
           </Typography>
         </Box>
         {/* Summary Cards */}
@@ -176,7 +179,7 @@ function ProviderServiceHistory() {
               sx={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white', minHeight: 98 }}>
               <CardContent sx={{ py: 2 }}>
                 <Typography variant="h3" sx={{ fontWeight: 'bold', fontSize: { xs: 25, md: 32 } }}>{allServices.length}</Typography>
-                <Typography variant="body2" sx={{ fontSize: { xs: 13, md: 16 } }}>Total Services</Typography>
+                <Typography variant="body2" sx={{ fontSize: { xs: 13, md: 16 } }}>{t('totalServices')}</Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -185,7 +188,7 @@ function ProviderServiceHistory() {
               sx={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', color: 'white', minHeight: 98 }}>
               <CardContent sx={{ py: 2 }}>
                 <Typography variant="h3" sx={{ fontWeight: 'bold', fontSize: { xs: 25, md: 32 } }}>{completedServices.length}</Typography>
-                <Typography variant="body2" sx={{ fontSize: { xs: 13, md: 16 } }}>Completed</Typography>
+                <Typography variant="body2" sx={{ fontSize: { xs: 13, md: 16 } }}>{t('completed')}</Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -194,7 +197,7 @@ function ProviderServiceHistory() {
               sx={{ background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', color: 'white', minHeight: 98 }}>
               <CardContent sx={{ py: 2 }}>
                 <Typography variant="h3" sx={{ fontWeight: 'bold', fontSize: { xs: 25, md: 32 } }}>{pendingServices.length}</Typography>
-                <Typography variant="body2" sx={{ fontSize: { xs: 13, md: 16 } }}>Pending</Typography>
+                <Typography variant="body2" sx={{ fontSize: { xs: 13, md: 16 } }}>{t('pending')}</Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -205,7 +208,7 @@ function ProviderServiceHistory() {
                 <Typography variant="h3" sx={{ fontWeight: 'bold', fontSize: { xs: 25, md: 32 } }}>
                   ₹{completedServices.reduce((sum, s) => sum + parseInt((s.amount || '0').replace('₹', '')), 0)}
                 </Typography>
-                <Typography variant="body2" sx={{ fontSize: { xs: 13, md: 16 } }}>Total Earnings</Typography>
+                <Typography variant="body2" sx={{ fontSize: { xs: 13, md: 16 } }}>{t('totalEarnings')}</Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -222,10 +225,10 @@ function ProviderServiceHistory() {
               allowScrollButtonsMobile
               aria-label="Service tabs"
             >
-              <Tab label={`All (${allServices.length})`} />
-              <Tab label={`Completed (${completedServices.length})`} />
-              <Tab label={`Pending (${pendingServices.length})`} />
-              <Tab label={`Cancelled (${cancelledServices.length})`} />
+              <Tab label={`${t('all')} (${allServices.length})`} />
+              <Tab label={`${t('completed')} (${completedServices.length})`} />
+              <Tab label={`${t('pending')} (${pendingServices.length})`} />
+              <Tab label={`${t('cancelled')} (${cancelledServices.length})`} />
             </Tabs>
           </Box>
         </Card>
@@ -244,7 +247,7 @@ function ProviderServiceHistory() {
             <Card elevation={2}>
               <CardContent sx={{ textAlign: 'center', py: { xs: 2, md: 6 } }}>
                 <Typography variant="h6" color="text.secondary">
-                  No services found
+                 {t('noServicesFound')}
                 </Typography>
               </CardContent>
             </Card>
@@ -268,20 +271,20 @@ function ProviderServiceHistory() {
         }}
       >
         <DialogTitle sx={{ fontWeight: 'bold', color: '#333', fontSize: { xs: "1.1rem", md: "1.5rem" } }}>
-          Service Details
+         {t('serviceDetails')}
         </DialogTitle>
         <DialogContent>
           {selectedService && (
             <Box>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
-                  <Typography variant="caption" color="text.secondary">Service ID</Typography>
+                  <Typography variant="caption" color="text.secondary">{t('serviceId')}</Typography>
                   <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                     #{selectedService.id}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <Typography variant="caption" color="text.secondary">Status</Typography>
+                  <Typography variant="caption" color="text.secondary">{t('status')}</Typography>
                   <Box>
                     <Chip
                       label={selectedService.status.toUpperCase()}
@@ -294,37 +297,37 @@ function ProviderServiceHistory() {
                   <Divider />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <Typography variant="caption" color="text.secondary">Customer Name</Typography>
+                  <Typography variant="caption" color="text.secondary">{t('customerName')}</Typography>
                   <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                     {selectedService.customer}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <Typography variant="caption" color="text.secondary">Service Type</Typography>
+                  <Typography variant="caption" color="text.secondary">{t('serviceType')}</Typography>
                   <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                     {selectedService.service}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <Typography variant="caption" color="text.secondary">Date</Typography>
+                  <Typography variant="caption" color="text.secondary">{t('date')}</Typography>
                   <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                     {new Date(selectedService.date).toLocaleDateString('en-IN')}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <Typography variant="caption" color="text.secondary">Time</Typography>
+                  <Typography variant="caption" color="text.secondary">{t('time')}</Typography>
                   <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                     {selectedService.time}
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
-                  <Typography variant="caption" color="text.secondary">Service Location</Typography>
+                  <Typography variant="caption" color="text.secondary">{t('serviceLocation')}</Typography>
                   <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                     {selectedService.address}
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
-                  <Typography variant="caption" color="text.secondary">Customer Phone</Typography>
+                  <Typography variant="caption" color="text.secondary">{t('customerPhone')}</Typography>
                   <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                     {selectedService.customerPhone}
                   </Typography>
@@ -333,7 +336,7 @@ function ProviderServiceHistory() {
                   <Divider />
                 </Grid>
                 <Grid item xs={12}>
-                  <Typography variant="caption" color="text.secondary">Earnings</Typography>
+                  <Typography variant="caption" color="text.secondary">{t('earnings')}</Typography>
                   <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#667eea', fontSize: { xs: 18, md: 22 } }}>
                     {selectedService.amount}
                   </Typography>
@@ -357,7 +360,7 @@ function ProviderServiceHistory() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog} variant="contained">
-            Close
+            {t('close')}
           </Button>
         </DialogActions>
       </Dialog>

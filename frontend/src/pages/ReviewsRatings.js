@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import {
-  Container, Box, Typography, Card, CardContent, Grid, Avatar, Rating, Button,
-  Divider, Chip, LinearProgress, Dialog, DialogTitle, DialogContent, DialogActions, TextField
-} from '@mui/material';
+import { Container, Box, Typography, Card, CardContent, Grid, Avatar, Rating, Button, Divider, Chip, LinearProgress, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import axios from 'axios';
 import { API_BASE_URL } from '../api.js';
+import { useTranslation } from 'react-i18next';
 
 function ReviewsRatings() {
+  const { t } = useTranslation();
   const userRole = localStorage.getItem("role");
   const userId = localStorage.getItem("userId");
   const { providerId } = useParams();
@@ -121,7 +120,7 @@ function ReviewsRatings() {
                       {ratingStats.average}
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-                      ({ratingStats.total} reviews)
+                      ({ratingStats.total} {t('reviews')})
                     </Typography>
                   </Box>
                 </Box>
@@ -136,7 +135,7 @@ function ReviewsRatings() {
                   }}
                   size="large"
                 >
-                  Write a Review
+                  {t('writeAReview')}
                 </Button>
               )}
             </Box>
@@ -148,7 +147,7 @@ function ReviewsRatings() {
             <Card elevation={3} sx={{ position: { md: 'sticky' }, top: 20, mb: { xs: 2, md: 0 } }}>
               <CardContent>
                 <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3, color: '#333' }}>
-                  Rating Breakdown
+                  {t('ratingBreakdown')}
                 </Typography>
                 <Box sx={{ textAlign: 'center', mb: 3 }}>
                   <Typography variant="h2" sx={{ fontWeight: 'bold', color: '#667eea', fontSize: { xs: 32, sm: 42 } }}>
@@ -156,7 +155,7 @@ function ReviewsRatings() {
                   </Typography>
                   <Rating value={ratingStats.average || 0} precision={0.1} readOnly size="large" />
                   <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                    Based on {ratingStats.total} reviews
+                    {t('basedOnReviews', { count: ratingStats.total })}
                   </Typography>
                 </Box>
                 <Divider sx={{ mb: 3 }} />
@@ -195,7 +194,7 @@ function ReviewsRatings() {
               color: '#333',
               fontSize: { xs: 18, sm: 22 }
             }}>
-              Customer Reviews ({allReviews.length})
+              {t('customerReviews', { count: allReviews.length })}
             </Typography>
             {allReviews.length === 0 && (
               <Typography
@@ -203,7 +202,7 @@ function ReviewsRatings() {
                 color="text.secondary"
                 sx={{ mb: 2, textAlign: "center", fontSize: { xs: 15, sm: 17 } }}
               >
-                No reviews yet. Be the first to add a review!
+                {t('noReviewsYet')}
               </Typography>
             )}
             {allReviews.map((review) => (
@@ -258,7 +257,7 @@ function ReviewsRatings() {
                       startIcon={<ThumbUpIcon />}
                       sx={{ color: '#667eea', fontSize: { xs: 13, sm: 15 } }}
                     >
-                      Helpful
+                      {t('helpful')}
                     </Button>
                   </Box>
                 </CardContent>
@@ -273,12 +272,12 @@ function ReviewsRatings() {
         <DialogTitle sx={{
           fontWeight: 'bold', color: '#333', fontSize: { xs: 18, sm: 22 }
         }}>
-          Write a Review for {provider.name}
+          {t('writeAReviewFor', { name: provider.name })}
         </DialogTitle>
         <DialogContent sx={{ px: { xs: 1, sm: 3 } }}>
           <Box sx={{ mt: 2 }}>
             <Typography variant="body2" sx={{ mb: 1 }}>
-              Your Rating *
+              {t('yourRating')}*
             </Typography>
             <Rating
               value={newReview.rating}
@@ -287,31 +286,31 @@ function ReviewsRatings() {
             />
             <TextField
               fullWidth
-              label="Review Title"
+              label={t('reviewTitle')}
               value={newReview.title}
               onChange={(e) => setNewReview({ ...newReview, title: e.target.value })}
               sx={{ mt: 3, mb: 2 }}
             />
             <TextField
               fullWidth
-              label="Your Review"
+              label={t('yourReview')}
               multiline
               rows={4}
               value={newReview.comment}
               onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
-              placeholder="Share your experience with this service provider..."
+              placeholder={t('reviewPlaceholder')}
             />
           </Box>
         </DialogContent>
         <DialogActions sx={{ p: 3 }}>
           <Button onClick={handleCloseReviewDialog} variant="outlined">
-            Cancel
+            {t('cancel')}
           </Button>
           <Button onClick={handleSubmitReview} variant="contained"
             disabled={!newReview.rating || !newReview.title || !newReview.comment}
             sx={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
           >
-            Submit Review
+            {t('submitReview')}
           </Button>
         </DialogActions>
       </Dialog>

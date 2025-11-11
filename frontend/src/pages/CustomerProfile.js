@@ -13,8 +13,12 @@ import { toast } from 'react-toastify';
 import axios from 'axios';
 import { IMAGE_SERVER } from '../api';
 import { API_BASE_URL } from '../api.js';
+import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 
 function CustomerProfile() {
+  const { t } = useTranslation();
+  const locale = i18n.language === 'hi' ? 'hi-IN' : 'en-US';
   const userId = localStorage.getItem("userId");
   const navigate = useNavigate();
   const fileInputRef = useRef();
@@ -113,10 +117,10 @@ function CustomerProfile() {
       await axios.patch(`${API_BASE_URL}/api/users/${userId}`, profileData);
       setShowSuccess(true);
       setIsEditing(false);
-      toast.success("Profile updated!");
+      toast.success(t('profileUpdatedSuccess'));
       setTimeout(() => setShowSuccess(false), 2500);
     } catch (err) {
-      toast.error("Could not update profile.");
+      toast.error(t('couldNotUpdateProfile'));
     }
   };
 
@@ -135,7 +139,7 @@ function CustomerProfile() {
 
   const handlePasswordUpdate = async () => {
     if (passwords.newPassword !== passwords.confirmPassword) {
-      toast.error("Passwords do not match!");
+      toast.error(t('passwordsMismatch'));
       return;
     }
     try {
@@ -145,10 +149,10 @@ function CustomerProfile() {
         currentPassword: passwords.currentPassword,
         newPassword: passwords.newPassword
       });
-      toast.success("Password updated successfully!");
+      toast.success(t('passwordUpdatedSuccess'));
       setPasswords({ currentPassword: '', newPassword: '', confirmPassword: '' });
     } catch (err) {
-      toast.error("Failed to update password!");
+      toast.error(t('passwordUpdateFailed'));
     }
   };
 
@@ -169,9 +173,9 @@ function CustomerProfile() {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setProfileData(prev => ({ ...prev, profileImage: res.data.profileImage }));
-      toast.success("Photo uploaded!");
+      toast.success(t('photoUploadedSuccess'));
     } catch {
-      toast.error("Photo upload failed");
+      toast.error(t('photoUploadFailed'));
     }
   };
 
@@ -179,10 +183,10 @@ function CustomerProfile() {
     try {
       await axios.patch(`${API_BASE_URL}/api/users/${userId}/status`);
       localStorage.clear();
-      toast.success("Account deactivated. Sorry to see you go!");
+      toast.success(t('accountDeactivated'));
       navigate('/login');
     } catch (err) {
-      toast.error("Could not deactivate account. Try again!");
+      toast.error(t('couldNotDeactivateAccount'));
     } finally {
       setDeleteDialogOpen(false);
     }
@@ -194,7 +198,7 @@ function CustomerProfile() {
       <Container maxWidth="lg" sx={{ mt: 4, mb: 6 }}>
         {showSuccess && (
           <Alert severity="success" sx={{ mb: 3 }}>
-            Profile updated successfully!
+            {t('profileUpdatedSuccessfully!')}
           </Alert>
         )}
 
@@ -237,10 +241,10 @@ function CustomerProfile() {
                   {profileData.name}
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
-                  Customer
+                  {t('customer')}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                  Member since {new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}
+                  {t('memberSince')} {new Date().toLocaleString(locale, { day: 'numeric', month: 'long', year: 'numeric' })}
                 </Typography>
               </Box>
               <Button
@@ -258,27 +262,27 @@ function CustomerProfile() {
                   }
                 }}
               >
-                {isEditing ? (profileData.name ? 'Save Changes' : 'Save Profile') : 'Edit Profile'}
+                {isEditing ? (profileData.name ? t('saveChanges') : t('saveProfile')) : t('editProfile')}
               </Button>
             </Box>
           </CardContent>
         </Card>
 
         {loading ? (
-          <Typography variant="body1" color="text.secondary">Loading profile...</Typography>
+          <Typography variant="body1" color="text.secondary">{t('loadingProfile')}</Typography>
         ) : (
           <Grid container spacing={3}>
             <Grid item xs={12} md={8}>
               <Card elevation={3}>
                 <CardContent>
                   <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3, color: '#333' }}>
-                    Personal Information
+                    {t('personalInformation')}
                   </Typography>
                   <Grid container spacing={3}>
                     <Grid item xs={12} sm={6}>
                       <TextField
                         fullWidth
-                        label="Full Name"
+                        label={t('fullName')}
                         name="name"
                         value={profileData.name}
                         onChange={handleInputChange}
@@ -288,7 +292,7 @@ function CustomerProfile() {
                     <Grid item xs={12} sm={6}>
                       <TextField
                         fullWidth
-                        label="Email Address"
+                        label={t('emailAddress')}
                         name="email"
                         type="email"
                         value={profileData.email}
@@ -299,7 +303,7 @@ function CustomerProfile() {
                     <Grid item xs={12} sm={6}>
                       <TextField
                         fullWidth
-                        label="Phone Number"
+                        label={t('phoneNumber')}
                         name="phone"
                         value={profileData.phone}
                         onChange={handleInputChange}
@@ -309,7 +313,7 @@ function CustomerProfile() {
                     <Grid item xs={12} sm={6}>
                       <TextField
                         fullWidth
-                        label="Pincode"
+                        label={t('Pincode')}
                         name="pincode"
                         value={profileData.pincode}
                         onChange={handleInputChange}
@@ -319,7 +323,7 @@ function CustomerProfile() {
                     <Grid item xs={12} sm={6}>
                       <TextField
                         fullWidth
-                        label="City"
+                        label={t('city')}
                         name="city"
                         value={profileData.city}
                         onChange={handleInputChange}
@@ -329,7 +333,7 @@ function CustomerProfile() {
                     <Grid item xs={12} sm={6}>
                       <TextField
                         fullWidth
-                        label="State"
+                        label={t('state')}
                         name="state"
                         value={profileData.state}
                         onChange={handleInputChange}
@@ -339,7 +343,7 @@ function CustomerProfile() {
                     <Grid item xs={12}>
                       <TextField
                         fullWidth
-                        label="Address"
+                        label={t('address')}
                         name="address"
                         multiline
                         rows={3}
@@ -360,7 +364,7 @@ function CustomerProfile() {
                           px: 4
                         }}
                       >
-                        Save Changes
+                        {t('saveChanges')}
                       </Button>
                     </Box>
                   )}
@@ -369,13 +373,13 @@ function CustomerProfile() {
               <Card elevation={3} sx={{ mt: 3 }}>
                 <CardContent>
                   <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3, color: '#333' }}>
-                    Change Password
+                    {t('changePassword')}
                   </Typography>
                   <Grid container spacing={3}>
                     <Grid item xs={12}>
                       <TextField
                         fullWidth
-                        label="Current Password"
+                        label={t('currentPassword')}
                         name="currentPassword"
                         type="password"
                         value={passwords.currentPassword}
@@ -385,7 +389,7 @@ function CustomerProfile() {
                     <Grid item xs={12} sm={6}>
                       <TextField
                         fullWidth
-                        label="New Password"
+                        label={t('newPassword')}
                         name="newPassword"
                         type="password"
                         value={passwords.newPassword}
@@ -395,7 +399,7 @@ function CustomerProfile() {
                     <Grid item xs={12} sm={6}>
                       <TextField
                         fullWidth
-                        label="Confirm New Password"
+                        label={t('confirmNewPassword')}
                         name="confirmPassword"
                         type="password"
                         value={passwords.confirmPassword}
@@ -412,7 +416,7 @@ function CustomerProfile() {
                         px: 4
                       }}
                     >
-                      Update Password
+                      {t('updatePassword')}
                     </Button>
                   </Box>
                 </CardContent>
@@ -424,7 +428,7 @@ function CustomerProfile() {
               <Card elevation={3} sx={{ mb: 3 }}>
                 <CardContent sx={{ px: { xs: 1, sm: 2.5 }, py: { xs: 2, md: 3 } }}>
                   <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3, color: '#333', textAlign: "center" }}>
-                    Account Statistics
+                    {t('accountStatistics')}
                   </Typography>
                   <Grid
                     container
@@ -451,7 +455,7 @@ function CustomerProfile() {
                         boxShadow: 3,
                       }}>
                         <Typography variant="body2" sx={{ opacity: 0.92, fontSize: 16 }}>
-                          Total Bookings
+                          {t('totalBookings')}
                         </Typography>
                         <Typography variant="h3" sx={{ fontWeight: 'bold', mt: 0.6 }}>
                           {stats.totalBookings}
@@ -473,7 +477,7 @@ function CustomerProfile() {
                         boxShadow: 3,
                       }}>
                         <Typography variant="body2" sx={{ opacity: 0.92, fontSize: 16 }}>
-                          Completed Services
+                          {t('completedServices')}
                         </Typography>
                         <Typography variant="h3" sx={{ fontWeight: 'bold', mt: 0.6 }}>
                           {stats.completedServices}
@@ -495,7 +499,7 @@ function CustomerProfile() {
                         boxShadow: 3,
                       }}>
                         <Typography variant="body2" sx={{ opacity: 0.92, fontSize: 16 }}>
-                          Total Spent
+                          {t('totalSpent')}
                         </Typography>
                         <Typography variant="h3" sx={{ fontWeight: 'bold', mt: 0.6 }}>
                           ₹{stats.totalSpent}
@@ -509,14 +513,14 @@ function CustomerProfile() {
               <Card elevation={3}>
                 <CardContent>
                   <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: '#333' }}>
-                    Quick Actions
+                    {t('quickActions')}
                   </Typography>
                   <Button
                     fullWidth
                     variant="outlined"
                     sx={{ mb: 2 }}
                   >
-                    Payment Methods
+                    {t('paymentMethods')}
                   </Button>
                   <Button
                     fullWidth
@@ -524,7 +528,7 @@ function CustomerProfile() {
                     color="error"
                     onClick={() => setDeleteDialogOpen(true)}
                   >
-                    Deactivate Account
+                    {t('deactivateAccount')}
                   </Button>
                 </CardContent>
               </Card>
@@ -533,11 +537,11 @@ function CustomerProfile() {
         )}
       </Container>
       <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-        <DialogTitle>Are you sure you want to delete your account? This action cannot be undone.</DialogTitle>
+        <DialogTitle>{t('confirmDeactivate')}</DialogTitle>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+          <Button onClick={() => setDeleteDialogOpen(false)}>{t('cancel')}</Button>
           <Button onClick={handleDeleteAccount} color="error" variant="contained">
-            Deactivate Account
+            {t('deactivateAccount')}
           </Button>
         </DialogActions>
       </Dialog>

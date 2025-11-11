@@ -10,8 +10,10 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../api.js';
+import { useTranslation } from 'react-i18next';
 
 function BookingHistory() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [tabValue, setTabValue] = useState(0);
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
@@ -100,13 +102,13 @@ function BookingHistory() {
                 <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
                   <Chip
                     icon={getStatusIcon(booking.status)}
-                    label={booking.status === 'accepted' ? 'PENDING (ACCEPTED)' : booking.status?.toUpperCase()}
+                    label={booking.status === 'accepted' ? t('pendingAccepted') : t(booking.status)}
                     color={getStatusColor(booking.status)}
                     size="small"
                     sx={{ mr: 2 }}
                   />
                   <Typography variant="caption" color="text.secondary">
-                    Service ID: #{booking._id}
+                    {t('serviceId')}: #{booking._id}
                   </Typography>
                 </Box>
               </Box>
@@ -129,7 +131,7 @@ function BookingHistory() {
                 mt: 0,
               }}
             >
-              View Details
+              {t('viewDetails')}
             </Button>
 
             {(booking.status === 'pending' || booking.status === 'accepted') && (
@@ -157,7 +159,7 @@ function BookingHistory() {
                   }
                 }}
               >
-                CANCEL BOOKING
+                {t('cancelBooking')}
               </Button>
             )}
 
@@ -177,13 +179,13 @@ function BookingHistory() {
           startIcon={<ArrowBackIcon />}
           onClick={() => navigate('/customer-dashboard')}
           sx={{ mb: 3, color: '#667eea' }}
-        >Back to Dashboard</Button>
+        >{t('backToDashboard')}</Button>
         <Box sx={{ mb: 4 }}>
           <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#333', mb: 1 }}>
-            Booking History
+            {t('bookingHistory')}
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            View all your past and upcoming bookings
+            {t('viewAllYourPastAndUpcomingBookings')}
           </Typography>
         </Box>
 
@@ -193,7 +195,7 @@ function BookingHistory() {
             <Card elevation={2} sx={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white', minHeight: 98 }}>
               <CardContent>
                 <Typography variant="h3" sx={{ fontWeight: 'bold' }}>{bookings.length}</Typography>
-                <Typography variant="body2">Total Bookings</Typography>
+                <Typography variant="body2">{t('totalBookings')}</Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -201,7 +203,7 @@ function BookingHistory() {
             <Card elevation={2} sx={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', color: 'white', minHeight: 98 }}>
               <CardContent>
                 <Typography variant="h3" sx={{ fontWeight: 'bold' }}>{completedBookings.length}</Typography>
-                <Typography variant="body2">Completed</Typography>
+                <Typography variant="body2">{t('completed')}</Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -209,7 +211,7 @@ function BookingHistory() {
             <Card elevation={2} sx={{ background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', color: 'white', minHeight: 98 }}>
               <CardContent>
                 <Typography variant="h3" sx={{ fontWeight: 'bold' }}>{pendingBookings.length}</Typography>
-                <Typography variant="body2">Pending</Typography>
+                <Typography variant="body2">{t('pending')}</Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -217,7 +219,7 @@ function BookingHistory() {
             <Card elevation={2} sx={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', color: 'white', minHeight: 98 }}>
               <CardContent>
                 <Typography variant="h3" sx={{ fontWeight: 'bold' }}>{cancelledBookings.length}</Typography>
-                <Typography variant="body2">Cancelled</Typography>
+                <Typography variant="body2">{t('cancelled')}</Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -227,10 +229,10 @@ function BookingHistory() {
         <Card elevation={3}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs value={tabValue} onChange={handleTabChange} variant="scrollable" scrollButtons allowScrollButtonsMobile aria-label="Booking tabs">
-              <Tab label={`All (${bookings.length})`} />
-              <Tab label={`Completed (${completedBookings.length})`} />
-              <Tab label={`Pending (${pendingBookings.length})`} />
-              <Tab label={`Cancelled (${cancelledBookings.length})`} />
+              <Tab label={`${t('all')} (${bookings.length})`} />
+              <Tab label={`${t('completed')} (${completedBookings.length})`} />
+              <Tab label={`${t('pending')} (${pendingBookings.length})`} />
+              <Tab label={`${t('cancelled')} (${cancelledBookings.length})`} />
             </Tabs>
           </Box>
         </Card>
@@ -238,7 +240,7 @@ function BookingHistory() {
         {/* Booking list */}
         <Box sx={{ mt: 3 }}>
           {loading ? (
-            <Typography>Loading...</Typography>
+            <Typography>{t('loading...')}</Typography>
           ) : getCurrentBookings().length > 0 ? (
             getCurrentBookings().map(booking =>
               <BookingCard key={booking._id} booking={booking} />
@@ -246,7 +248,7 @@ function BookingHistory() {
           ) : (
             <Card elevation={2}>
               <CardContent sx={{ textAlign: 'center', py: 6 }}>
-                <Typography variant="h6" color="text.secondary">No bookings found</Typography>
+                <Typography variant="h6" color="text.secondary">{t('noBookingsFound')}</Typography>
               </CardContent>
             </Card>
           )}
@@ -280,11 +282,11 @@ function BookingHistory() {
             </Box>
             <Grid container spacing={2} alignItems="center" sx={{ mb: 1 }}>
               <Grid item xs={12} sm={3}>
-                <Typography variant="body2" sx={{ color: "gray" }}>Service ID</Typography>
+                <Typography variant="body2" sx={{ color: "gray" }}>{t('serviceId')}</Typography>
                 <Typography variant="body1" sx={{ fontWeight: "bold" }}>#{selectedBooking._id}</Typography>
               </Grid>
               <Grid item xs={12} sm={2}>
-                <Typography variant="body2" sx={{ color: "gray" }}>Status</Typography>
+                <Typography variant="body2" sx={{ color: "gray" }}>{t('status')}</Typography>
                 <Chip
                   icon={getStatusIcon(selectedBooking.status)}
                   label={selectedBooking.status ? selectedBooking.status.toUpperCase() : "--"}
@@ -294,37 +296,37 @@ function BookingHistory() {
                 />
               </Grid>
               <Grid item xs={12} sm={4}>
-                <Typography variant="body2" sx={{ color: "gray" }}>Provider Name</Typography>
+                <Typography variant="body2" sx={{ color: "gray" }}>{t('providerName')}</Typography>
                 <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                   {selectedBooking.provider?.user?.name || "--"}
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={3}>
-                <Typography variant="body2" sx={{ color: "gray" }}>Service Type</Typography>
+                <Typography variant="body2" sx={{ color: "gray" }}>{t('serviceType')}</Typography>
                 <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                   {selectedBooking.provider?.service || selectedBooking.service || "--"}
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={2}>
-                <Typography variant="body2" sx={{ color: "gray" }}>Date</Typography>
+                <Typography variant="body2" sx={{ color: "gray" }}>{t('date')}</Typography>
                 <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                   {new Date(selectedBooking.date).toLocaleDateString("en-IN")}
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={3}>
-                <Typography variant="body2" sx={{ color: "gray" }}>Time</Typography>
+                <Typography variant="body2" sx={{ color: "gray" }}>{t('time')}</Typography>
                 <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                   {selectedBooking.time}
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={9}>
-                <Typography variant="body2" sx={{ color: "gray" }}>Service Location</Typography>
+                <Typography variant="body2" sx={{ color: "gray" }}>{t('serviceLocation')}</Typography>
                 <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                   {selectedBooking.address}
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={2}>
-                <Typography variant="body2" sx={{ color: "gray" }}>Earnings</Typography>
+                <Typography variant="body2" sx={{ color: "gray" }}>{t('earnings')}</Typography>
                 <Typography variant="h6" sx={{ fontWeight: "bold", color: "#667eea" }}>
                   ₹{selectedBooking.amount}
                 </Typography>
@@ -332,13 +334,13 @@ function BookingHistory() {
             </Grid>
             <Grid container spacing={2} alignItems="center" sx={{ mt: 2 }}>
               <Grid item xs={12} sm={4}>
-                <Typography variant="body2" sx={{ color: "gray" }}>Provider Phone</Typography>
+                <Typography variant="body2" sx={{ color: "gray" }}>{t('providerPhone')}</Typography>
                 <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                   {selectedBooking.provider?.phone || selectedBooking.provider?.user?.phone || "--"}
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={4}>
-                <Typography variant="body2" sx={{ color: "gray" }}>Customer Rating</Typography>
+                <Typography variant="body2" sx={{ color: "gray" }}>{t('customerRating')}</Typography>
                 <Box sx={{ display: "flex", alignItems: "center", mt: 0.5 }}>
                   <Rating value={selectedBooking.provider?.rating || selectedBooking.rating || 0} readOnly size="medium" />
                   <Typography variant="h6" sx={{ fontWeight: "bold", color: "#fbc02d", ml: 1 }}>
@@ -352,7 +354,7 @@ function BookingHistory() {
             </Grid>
             <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
               <Button variant="contained" onClick={handleCloseDialog} sx={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", width: 120, fontWeight: "bold" }}>
-                CLOSE
+                {t('close')}
               </Button>
             </Box>
           </DialogContent>

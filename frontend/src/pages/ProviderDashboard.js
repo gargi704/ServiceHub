@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Container, Box, Typography, Card, CardContent, Grid, Chip, Button,
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Avatar
-} from '@mui/material';
+import { Container, Box, Typography, Card, CardContent, Grid, Chip, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Avatar } from '@mui/material';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -16,6 +13,7 @@ import MuiAlert from '@mui/material/Alert'
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API_BASE_URL } from '../api.js';
+import { useTranslation } from 'react-i18next';
 
 function ProviderDashboard() {
   const userRole = localStorage.getItem('role');
@@ -31,6 +29,7 @@ function ProviderDashboard() {
     rating: 0
   });
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const storedUserId = localStorage.getItem('userId');
@@ -138,21 +137,9 @@ function ProviderDashboard() {
         <Box sx={{
           mb: { xs: 2, md: 4 }
         }}>
-          <Box sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
-            alignItems: { xs: 'stretch', sm: 'center' },
-            gap: { xs: 2, sm: 0 },
-            mb: 2
-          }}>
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'stretch', sm: 'center' }, gap: { xs: 2, sm: 0 }, mb: 2 }}>
             <Avatar
-              src={
-                profile?.profileImage
-                  ? (profile.profileImage.startsWith('http')
-                    ? profile.profileImage
-                    : `${API_BASE_URL}${profile.profileImage}`)
-                  : undefined
-              }
+              src={profile?.profileImage ? (profile.profileImage.startsWith('http') ? profile.profileImage : `${API_BASE_URL}${profile.profileImage}`) : undefined}
               sx={{
                 width: 70, height: 70, mr: { sm: 3, xs: 0 },
                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -161,7 +148,12 @@ function ProviderDashboard() {
                 mb: { xs: 2, sm: 0 }, mx: { xs: 'auto', sm: 0 }
               }}
             >
-              {profile?.user?.name ? profile.user.name.split(" ").map(n => n[0]).join("") : user?.name ? user.name.split(" ").map(n => n[0]).join("") : "RK"}
+              {(profile && profile.user && typeof profile.user.name === 'string')
+                ? profile.user.name.split(" ").map(n => n[0]).join("")
+                : (user && typeof user.name === 'string')
+                  ? user.name.split(" ").map(n => n[0]).join("")
+                  : "RK"}
+
             </Avatar>
             <Box>
               <Typography variant="h4" sx={{
@@ -171,7 +163,7 @@ function ProviderDashboard() {
                 {profile?.user?.name ? profile.user.name : user?.name ? user.name : "Provider"}
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ fontSize: { xs: 15, sm: 17 } }}>
-                {profile?.service} | {profile?.experience}+ years experience
+                {profile?.service} | {profile?.experience}+ {t('yearsExperience')}
               </Typography>
             </Box>
           </Box>
@@ -186,7 +178,7 @@ function ProviderDashboard() {
                 '&:hover': { background: '#667eea', color: 'white' }
               }}
             >
-              Service History
+              {t('serviceHistory')}
             </Button>
             <Button
               variant="outlined"
@@ -198,7 +190,7 @@ function ProviderDashboard() {
                 '&:hover': { background: '#667eea', color: 'white' }
               }}
             >
-              Create/Edit Profile
+              {t('createEditProfile')}
             </Button>
           </Box>
         </Box>
@@ -216,7 +208,7 @@ function ProviderDashboard() {
                     <Typography variant="h4" sx={{ fontWeight: 'bold', fontSize: { xs: 20, md: 28 } }}>
                       {stats.totalBookings}
                     </Typography>
-                    <Typography variant="body2">Total Bookings</Typography>
+                    <Typography variant="body2">{t('totalBookings')}</Typography>
                   </Box>
                   <WorkIcon sx={{ fontSize: 45, opacity: 0.8 }} />
                 </Box>
@@ -234,7 +226,7 @@ function ProviderDashboard() {
                     <Typography variant="h4" sx={{ fontWeight: 'bold', fontSize: { xs: 20, md: 28 } }}>
                       ₹{stats.earnings}
                     </Typography>
-                    <Typography variant="body2">Total Earnings</Typography>
+                    <Typography variant="body2">{t('totalEarnings')}</Typography>
                   </Box>
                   <AttachMoneyIcon sx={{ fontSize: 45, opacity: 0.8 }} />
                 </Box>
@@ -252,7 +244,7 @@ function ProviderDashboard() {
                     <Typography variant="h4" sx={{ fontWeight: 'bold', fontSize: { xs: 20, md: 28 } }}>
                       {stats.completedJobs}
                     </Typography>
-                    <Typography variant="body2">Completed Jobs</Typography>
+                    <Typography variant="body2">{t('completedJobs')}</Typography>
                   </Box>
                   <CheckCircleIcon sx={{ fontSize: 45, opacity: 0.8 }} />
                 </Box>
@@ -270,7 +262,7 @@ function ProviderDashboard() {
                     <Typography variant="h4" sx={{ fontWeight: 'bold', fontSize: { xs: 20, md: 28 } }}>
                       {stats.rating}
                     </Typography>
-                    <Typography variant="body2">Average Rating</Typography>
+                    <Typography variant="body2">{t('averageRating')}</Typography>
                   </Box>
                   <StarIcon sx={{ fontSize: 45, opacity: 0.8 }} />
                 </Box>
@@ -286,7 +278,7 @@ function ProviderDashboard() {
               mb: 3, fontWeight: 'bold', color: '#333',
               fontSize: { xs: 18, md: 24 }
             }}>
-              Recent Bookings
+              {t('recentBookings')}
             </Typography>
             <TableContainer component={Paper} elevation={0} sx={{
               width: '100%',
@@ -295,13 +287,13 @@ function ProviderDashboard() {
               <Table size="small">
                 <TableHead>
                   <TableRow sx={{ background: '#f5f5f5' }}>
-                    <TableCell sx={{ fontWeight: 'bold', whiteSpace: 'nowrap', fontSize: { xs: 12, md: 15 } }}>Booking ID</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', whiteSpace: 'nowrap', fontSize: { xs: 12, md: 15 } }}>Customer</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', whiteSpace: 'nowrap', fontSize: { xs: 12, md: 15 } }}>Service</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', whiteSpace: 'nowrap', fontSize: { xs: 12, md: 15 } }}>Date</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', whiteSpace: 'nowrap', fontSize: { xs: 12, md: 15 } }}>Amount</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', whiteSpace: 'nowrap', fontSize: { xs: 12, md: 15 } }}>Status</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', whiteSpace: 'nowrap', fontSize: { xs: 12, md: 15 } }}>Action</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', whiteSpace: 'nowrap', fontSize: { xs: 12, md: 15 } }}>{t('bookingId')}</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', whiteSpace: 'nowrap', fontSize: { xs: 12, md: 15 } }}>{t('customer')}</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', whiteSpace: 'nowrap', fontSize: { xs: 12, md: 15 } }}>{t('service')}</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', whiteSpace: 'nowrap', fontSize: { xs: 12, md: 15 } }}>{t('date')}</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', whiteSpace: 'nowrap', fontSize: { xs: 12, md: 15 } }}>{t('amount')}</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', whiteSpace: 'nowrap', fontSize: { xs: 12, md: 15 } }}>{t('status')}</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', whiteSpace: 'nowrap', fontSize: { xs: 12, md: 15 } }}>{t('action')}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -316,34 +308,22 @@ function ProviderDashboard() {
                       </TableCell>
                       <TableCell>
                         {booking.status === 'pending' ? (
-                          <Chip
-                            icon={<PendingIcon />}
-                            label="Pending"
-                            color="warning"
-                            size="small"
-                            sx={{ fontSize: 11 }}
-                          />
+                          <Chip icon={<PendingIcon />} label="Pending" color="warning" size="small" sx={{ fontSize: 11 }} />
                         ) : (
-                          <Chip
-                            icon={<CheckCircleIcon />}
-                            label="Completed"
-                            color="success"
-                            size="small"
-                            sx={{ fontSize: 11 }}
-                          />
+                          <Chip icon={<CheckCircleIcon />} label="Completed" color="success" size="small" sx={{ fontSize: 11 }} />
                         )}
                       </TableCell>
                       <TableCell>
                         {booking.status === 'pending' && (
                           <>
-                            <Button onClick={() => handleAcceptBooking(booking._id)} variant="contained" color="primary" size="small" sx={{ mr: 1, fontSize: 11 }}>Accept</Button>
-                            <Button onClick={() => handleCancelBooking(booking._id)} variant="outlined" color="error" size="small" sx={{ fontSize: 11 }}>Cancel</Button>
+                            <Button onClick={() => handleAcceptBooking(booking._id)} variant="contained" color="primary" size="small" sx={{ mr: 1, fontSize: 11 }}>{t('accept')}</Button>
+                            <Button onClick={() => handleCancelBooking(booking._id)} variant="outlined" color="error" size="small" sx={{ fontSize: 11 }}>{t('cancel')}</Button>
                           </>
                         )}
                         {booking.status === 'accepted' && (
                           <>
-                            <Button onClick={() => handleMarkComplete(booking._id)} variant="contained" color="success" size="small" sx={{ mr: 1, fontSize: 11 }}>Complete</Button>
-                            <Button onClick={() => handleCancelBooking(booking._id)} variant="outlined" color="error" size="small" sx={{ fontSize: 11 }}>Cancel</Button>
+                            <Button onClick={() => handleMarkComplete(booking._id)} variant="contained" color="success" size="small" sx={{ mr: 1, fontSize: 11 }}>{t('complete')}</Button>
+                            <Button onClick={() => handleCancelBooking(booking._id)} variant="outlined" color="error" size="small" sx={{ fontSize: 11 }}>{t('cancel')}</Button>
                           </>
                         )}
                         {booking.status === 'completed' && (

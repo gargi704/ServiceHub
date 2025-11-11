@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Container, Box, Typography, Card, CardContent, Grid, TextField,
-  Button, Chip, Avatar, Rating, Dialog, DialogTitle, DialogContent,
-  DialogActions, FormControl, InputLabel, Select, MenuItem
-} from '@mui/material';
+import { Container, Box, Typography, Card, CardContent, Grid, TextField, Button, Chip, Avatar, Rating, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import SearchIcon from '@mui/icons-material/Search';
@@ -14,8 +10,11 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import { API_BASE_URL } from '../api.js';
+import { useTranslation } from 'react-i18next';
+import { Trans } from 'react-i18next';
 
 function CustomerDashboard() {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedService, setSelectedService] = useState('');
   const [openBooking, setOpenBooking] = useState(false);
@@ -37,7 +36,7 @@ function CustomerDashboard() {
         const res = await axios.get(`${API_BASE_URL}/api/providers`);
         setProviders(res.data);
       } catch (error) {
-        toast.error("Could not load providers!");
+        toast.error(t('couldNotLoadProviders'));
       }
       setLoading(false);
     }
@@ -62,7 +61,7 @@ function CustomerDashboard() {
 
   const handleConfirmBooking = async () => {
     if (!selectedProvider || !bookingDate || !bookingTime || !bookingAddress) {
-      toast.error("Please enter all booking details!");
+      toast.error(t('pleaseEnterBookingDetails'));
       return;
     }
     const bookingPayload = {
@@ -78,11 +77,11 @@ function CustomerDashboard() {
     try {
       await axios.post(`${API_BASE_URL}/api/bookings`, bookingPayload);
       toast.success(
-        `Booking confirmed with ${selectedProvider.user?.name || selectedProvider.name}!`
+        t('bookingConfirmed', { name: selectedProvider.user?.name || selectedProvider.name })
       );
       handleCloseBooking();
     } catch (error) {
-      toast.error("Booking failed!");
+      toast.error(t('bookingFailed'));
     }
   };
 
@@ -97,7 +96,6 @@ function CustomerDashboard() {
       <Container maxWidth="lg" sx={{ mt: { xs: 2, sm: 3, md: 4 }, mb: { xs: 3, md: 6 }, px: { xs: 0.5, sm: 2 } }}>
         {/* Header section */}
         <Box sx={{ mb: { xs: 2, md: 4 } }}>
-          {/* Responsive heading and quick navs */}
           <Box
             sx={{
               display: 'flex',
@@ -112,7 +110,7 @@ function CustomerDashboard() {
               color: '#333',
               fontSize: { xs: 20, sm: 26, md: 30 }
             }}>
-              Find Service Providers Near You
+              {t('findServiceProvidersNearYou')}
             </Typography>
             <Box sx={{
               display: 'flex',
@@ -132,7 +130,7 @@ function CustomerDashboard() {
                   '&:hover': { background: '#667eea', color: 'white' }
                 }}
               >
-                Booking History
+                {t('bookingHistory')}
               </Button>
               <Button
                 variant="outlined"
@@ -145,7 +143,7 @@ function CustomerDashboard() {
                   '&:hover': { background: '#667eea', color: 'white' }
                 }}
               >
-                Create/Edit Profile
+                {t('createEditProfile')}
               </Button>
             </Box>
           </Box>
@@ -155,7 +153,7 @@ function CustomerDashboard() {
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  placeholder="Search for services..."
+                  placeholder={t('searchForServices...')}
                   variant="outlined"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -171,14 +169,14 @@ function CustomerDashboard() {
                   <InputLabel>Filter by Service</InputLabel>
                   <Select
                     value={selectedService}
-                    label="Filter by Service"
+                    label={t('filterByService')}
                     onChange={(e) => setSelectedService(e.target.value)}
                   >
-                    <MenuItem value="">All Services</MenuItem>
-                    <MenuItem value="Electrician">Electrician</MenuItem>
-                    <MenuItem value="Plumber">Plumber</MenuItem>
-                    <MenuItem value="Painter">Painter</MenuItem>
-                    <MenuItem value="Labor">Labor</MenuItem>
+                    <MenuItem value="">{t('allServices')}</MenuItem>
+                    <MenuItem value="Electrician">{t('electrician')}</MenuItem>
+                    <MenuItem value="Plumber">{t('plumber')}</MenuItem>
+                    <MenuItem value="Painter">{t('painter')}</MenuItem>
+                    <MenuItem value="Labor">{t('labor')}</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
@@ -194,7 +192,7 @@ function CustomerDashboard() {
                     fontSize: { xs: 14, sm: 16 }
                   }}
                 >
-                  Search
+                  {t('search')}
                 </Button>
               </Grid>
             </Grid>
@@ -204,14 +202,14 @@ function CustomerDashboard() {
         {/* Providers List Section */}
         {loading ? (
           <Typography variant="body1" sx={{ textAlign: 'center', mt: 4 }}>
-            Loading providers...
+            {t('loadingProviders...')}
           </Typography>
         ) : (
           <Grid container spacing={{ xs: 1.3, md: 2.5 }}>
             {filteredProviders.length === 0 && (
               <Grid item xs={12}>
                 <Typography variant="body1" color="text.secondary" sx={{ textAlign: "center" }}>
-                  No providers found.
+                  {t('noProvidersFound')}.
                 </Typography>
               </Grid>
             )}
@@ -260,7 +258,7 @@ function CustomerDashboard() {
                     </Box>
                   </Box>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    <b>Experience:</b> {provider.experience} yrs
+                    <b>{t('Experience')}:</b> {provider.experience} yrs
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                     <LocationOnIcon sx={{ fontSize: 17, color: 'gray', mr: 0.7 }} />
@@ -285,7 +283,7 @@ function CustomerDashboard() {
                       onClick={() => navigate(`/reviews/${provider._id}`)}
                       sx={{ fontSize: 12, py: 0.54, px: 1.6, minWidth: 64 }}
                     >
-                      Reviews
+                      {t('reviews')}
                     </Button>
                     <Button
                       variant="contained"
@@ -296,7 +294,7 @@ function CustomerDashboard() {
                         '&:hover': { transform: 'scale(1.045)' }
                       }}
                     >
-                      Book Now
+                      {t('bookNow')}
                     </Button>
                   </Box>
                 </Card>
@@ -316,19 +314,25 @@ function CustomerDashboard() {
             }
           }}>
           <DialogTitle sx={{ fontWeight: 'bold', color: '#333', fontSize: { xs: 17, sm: 20 } }}>
-            Confirm Booking
+            {t('confirmBooking')}
           </DialogTitle>
           <DialogContent>
             {selectedProvider && (
               <Box>
                 <Typography variant="body1" sx={{ mb: 2, fontSize: { xs: 13, sm: 15 } }}>
-                  You are booking <strong>{selectedProvider.user?.name}</strong>
-                  {` for `}
-                  <strong>{selectedProvider.service}</strong> service.
+                  <Trans
+                    i18nKey="youAreBooking"
+                    values={{
+                      name: selectedProvider.user?.name,
+                      service: selectedProvider.service
+                    }}
+                    components={{ 1: <strong />, 3: <strong /> }}
+                  />
                 </Typography>
+
                 <TextField
                   fullWidth
-                  label="Date"
+                  label={t('date')}
                   type="date"
                   value={bookingDate}
                   onChange={(e) => setBookingDate(e.target.value)}
@@ -338,7 +342,7 @@ function CustomerDashboard() {
                 />
                 <TextField
                   fullWidth
-                  label="Time"
+                  label={t('time')}
                   type="time"
                   value={bookingTime}
                   onChange={(e) => setBookingTime(e.target.value)}
@@ -348,7 +352,7 @@ function CustomerDashboard() {
                 />
                 <TextField
                   fullWidth
-                  label="Address"
+                  label={t('address')}
                   multiline
                   rows={3}
                   placeholder="Enter your address..."
@@ -360,7 +364,7 @@ function CustomerDashboard() {
             )}
           </DialogContent>
           <DialogActions sx={{ p: 2, flexDirection: { xs: "column", sm: "row" }, gap: 1 }}>
-            <Button onClick={handleCloseBooking} variant="outlined" fullWidth size="medium">Cancel</Button>
+            <Button onClick={handleCloseBooking} variant="outlined" fullWidth size="medium">{t('cancel')}</Button>
             <Button
               onClick={handleConfirmBooking}
               variant="contained"
@@ -372,7 +376,7 @@ function CustomerDashboard() {
               fullWidth
               size="medium"
             >
-              Confirm Booking
+              {t('confirmBooking')}
             </Button>
           </DialogActions>
         </Dialog>
