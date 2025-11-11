@@ -16,7 +16,7 @@ import { API_BASE_URL } from '../api.js';
 import { useTranslation } from 'react-i18next';
 
 function ProviderDashboard() {
-  const userRole = localStorage.getItem('role');
+  // const userRole = localStorage.getItem('role');
   const [user, setUser] = useState(null);
   const [showWelcome, setShowWelcome] = useState(false);
   const [userId, setUserId] = useState(null);
@@ -96,7 +96,8 @@ function ProviderDashboard() {
 
   useEffect(() => {
     fetchAllData();
-  }, [userId]);
+  }, [userId, fetchAllData]);
+
 
   const handleAcceptBooking = async (bookingId) => {
     await axios.patch(`${API_BASE_URL}/api/bookings/status/${bookingId}`, { status: 'accepted' });

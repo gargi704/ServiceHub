@@ -15,7 +15,7 @@ import { IMAGE_SERVER } from '../api';
 import { useTranslation } from 'react-i18next';
 
 function ProviderProfile() {
-   const { t } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const userId = localStorage.getItem('userId');
   // console.log("ProviderProfile loaded. userId in localStorage =", userId);
@@ -82,7 +82,7 @@ function ProviderProfile() {
         setIsEditing(true);
         setLoaded(true);
       });
-  }, [userId, navigate]);
+  }, [userId, navigate, defaultProfile, emptyUser]);
 
   // const handleUpload = (type) => async (e) => {
   //   const files = e.target.files;
@@ -256,12 +256,12 @@ function ProviderProfile() {
             <Card elevation={3} sx={{ mb: 3 }}>
               <CardContent>
                 <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2, color: '#333' }}>
-                 {t('professionalInformation')}
+                  {t('professionalInformation')}
                 </Typography>
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={6}>
                     <TextField
-                      label= {t('fullName')}
+                      label={t('fullName')}
                       name="name"
                       fullWidth
                       value={profile.user?.name || ""}

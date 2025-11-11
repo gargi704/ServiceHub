@@ -10,7 +10,7 @@ import { loginUser } from '../api/auth';
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('');
+  const [role] = useState('');
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {

@@ -41,7 +41,7 @@ function CustomerDashboard() {
       setLoading(false);
     }
     fetchProviders();
-  }, []);
+  }, [t]);
 
   const handleBookNow = (provider) => {
     setSelectedProvider(provider);
