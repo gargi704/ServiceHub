@@ -10,7 +10,7 @@ import { loginUser } from '../api/auth';
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role] = useState('');
+  const role = '';
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -33,7 +33,7 @@ function Login() {
         navigate('/customer-dashboard');
       }
     } catch (err) {
-      localStorage.clear(); 
+      localStorage.clear();
       if (err.response?.status === 403) {
         toast.error('Your account is inactive or deleted. Please contact support.');
       } else {

@@ -43,6 +43,7 @@ function CustomerDashboard() {
     fetchProviders();
   }, [t]);
 
+
   const handleBookNow = (provider) => {
     setSelectedProvider(provider);
     setOpenBooking(true);

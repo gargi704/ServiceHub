@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Container, Box, Typography, Card, CardContent, Grid, Chip, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Avatar } from '@mui/material';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -62,7 +62,7 @@ function ProviderDashboard() {
     setUserId(storedUserId);
   }, [navigate]);
 
-  const fetchAllData = async () => {
+  const fetchAllData = useCallback(async () => {
     if (!userId) return;
     try {
       const providerRes = await axios.get(`${API_BASE_URL}/api/providers/by-user/${userId}`);
@@ -92,12 +92,11 @@ function ProviderDashboard() {
       setBookings([]);
       setStats({ totalBookings: 0, earnings: 0, completedJobs: 0, rating: 0 });
     }
-  };
+  }, [userId]);
 
   useEffect(() => {
     fetchAllData();
-  }, [userId, fetchAllData]);
-
+  }, [fetchAllData]);
 
   const handleAcceptBooking = async (bookingId) => {
     await axios.patch(`${API_BASE_URL}/api/bookings/status/${bookingId}`, { status: 'accepted' });

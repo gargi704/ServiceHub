@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Container, Grid, Box, Card, CardContent, TextField, Button, Typography, Avatar, Chip, Alert, Rating } from '@mui/material';
 import { toast } from 'react-toastify';
 import Navbar from '../components/Navbar';
@@ -19,8 +19,8 @@ function ProviderProfile() {
   const navigate = useNavigate();
   const userId = localStorage.getItem('userId');
   // console.log("ProviderProfile loaded. userId in localStorage =", userId);
-  const emptyUser = { name: '' };
-  const defaultProfile = {
+  const emptyUser = useMemo(() => ({ name: '' }), []);
+  const defaultProfile = useMemo(() => ({
     _id: "",
     user: emptyUser,
     service: '',
@@ -39,7 +39,8 @@ function ProviderProfile() {
     completedJobs: 0,
     earnings: 0,
     rating: 0,
-  };
+  }), [emptyUser]);
+
   const [profile, setProfile] = useState(defaultProfile);
   const [loaded, setLoaded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -83,7 +84,7 @@ function ProviderProfile() {
         setLoaded(true);
       });
   }, [userId, navigate, defaultProfile, emptyUser]);
-
+  
   // const handleUpload = (type) => async (e) => {
   //   const files = e.target.files;
   //   if (!files.length) return;
