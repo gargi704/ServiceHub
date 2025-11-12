@@ -100,7 +100,7 @@ function Navbar({ scrollToServices }) {
                     '&:hover': { background: '#ffd700', color: '#667eea' }
                   }}
                 >
-                  Register
+                  {t('register')}
                 </Button>
               </>
             )}
@@ -138,10 +138,27 @@ function Navbar({ scrollToServices }) {
                 </ListItem>
               )
             )}
+            {/* LANGUAGE SWITCHER BUTTON FOR MOBILE */}
+            <ListItem>
+              <Button
+                color="inherit"
+                size="small"
+                onClick={() => i18n.changeLanguage(i18n.language === 'en' ? 'hi' : 'en')}
+                sx={{
+                  fontWeight: 700,
+                  border: "1px solid #ddd",
+                  mt: 1,
+                  width: "100%"
+                }}
+              >
+                {i18n.language === 'en' ? 'हिंदी' : 'EN'}
+              </Button>
+            </ListItem>
           </List>
           <Divider />
         </Box>
       </Drawer>
+
     </>
   );
 }

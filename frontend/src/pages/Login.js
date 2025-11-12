@@ -6,8 +6,11 @@ import LoginIcon from '@mui/icons-material/Login';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { loginUser } from '../api/auth';
+import { useTranslation } from 'react-i18next';
+
 
 function Login() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const role = '';
@@ -51,15 +54,15 @@ function Login() {
             <CardContent sx={{ p: 4 }}>
               <Box sx={{ textAlign: 'center', mb: 3 }}>
                 <LoginIcon sx={{ fontSize: 50, color: '#667eea', mb: 2 }} />
-                <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#333' }}>Login</Typography>
+                <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#333' }}>{t('login')}</Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                  Welcome back! Please login to your account
+                  {t('loginSubtitle')}
                 </Typography>
               </Box>
               <form onSubmit={handleLogin}>
                 <TextField
                   fullWidth
-                  label="Email Address"
+                  label={t('emailAddress')}
                   type="email"
                   variant="outlined"
                   value={email}
@@ -69,7 +72,7 @@ function Login() {
                 />
                 <TextField
                   fullWidth
-                  label="Password"
+                  label={t('password')}
                   type="password"
                   variant="outlined"
                   value={password}
@@ -106,17 +109,17 @@ function Login() {
                     }
                   }}
                 >
-                  Login
+                  {t('login')}
                 </Button>
                 <Box sx={{ textAlign: 'center', mt: 3 }}>
                   <Typography variant="body2" color="text.secondary">
-                    Don't have an account?{' '}
+                   {t('noAccount')}?{' '}
                     <MuiLink
                       component={Link}
                       to="/register"
                       sx={{ color: '#667eea', fontWeight: 'bold', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
                     >
-                      Register here
+                      {t('registerHere')}
                     </MuiLink>
                   </Typography>
                 </Box>

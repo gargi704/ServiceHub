@@ -6,8 +6,10 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { registerUser } from '../api/auth';
+import { useTranslation } from 'react-i18next';
 
 function Register() {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -51,52 +53,52 @@ function Register() {
               <Box sx={{ textAlign: 'center', mb: 3 }}>
                 <PersonAddIcon sx={{ fontSize: 50, color: '#667eea', mb: 2 }} />
                 <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#333' }}>
-                  Create Account
+                  {t('createAccount')}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                  Join us today! Fill in the details below
+                  {t('registerSubtitle')}
                 </Typography>
               </Box>
 
               <form onSubmit={handleRegister}>
                 <Grid container spacing={3}>
                   <Grid item xs={12} sm={6}>
-                    <TextField fullWidth label="Full Name" name="name" variant="outlined" value={formData.name} onChange={handleChange} required />
+                    <TextField fullWidth label={t('fullName')} name="name" variant="outlined" value={formData.name} onChange={handleChange} required />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <TextField fullWidth label="Email Address" name="email" type="email" variant="outlined" value={formData.email} onChange={handleChange} required />
+                    <TextField fullWidth label={t('emailAddress')} name="email" type="email" variant="outlined" value={formData.email} onChange={handleChange} required />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <TextField fullWidth label="Phone Number" name="phone" type="tel" variant="outlined" value={formData.phone} onChange={handleChange} required />
+                    <TextField fullWidth label={t('phoneNumber')} name="phone" type="tel" variant="outlined" value={formData.phone} onChange={handleChange} required />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <TextField fullWidth label="Password" name="password" type="password" variant="outlined" value={formData.password} onChange={handleChange} required />
+                    <TextField fullWidth label={t('password')} name="password" type="password" variant="outlined" value={formData.password} onChange={handleChange} required />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField fullWidth label={t('address')} name="address" variant="outlined" multiline rows={2} value={formData.address} onChange={handleChange} required />
                   </Grid>
                   <Grid item xs={12}>
                     <FormControl fullWidth>
-                      <InputLabel>Register As</InputLabel>
-                      <Select name="role" value={formData.role} label="Register As" onChange={handleChange} required>
-                        <MenuItem value="customer">Customer (I need services)</MenuItem>
-                        <MenuItem value="provider">Service Provider (I provide services)</MenuItem>
+                      <InputLabel>{t('registerAs')}</InputLabel>
+                      <Select name="role" value={formData.role} label="Register As" onChange={handleChange} required inputProps={{ style: { paddingRight: 206 } }}>
+                        <MenuItem value="customer">{t('customerNeedsServices')}</MenuItem>
+                        <MenuItem value="provider">{t('providerGivesServices')}</MenuItem>
                       </Select>
                     </FormControl>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField fullWidth label="Address" name="address" variant="outlined" multiline rows={2} value={formData.address} onChange={handleChange} required />
                   </Grid>
                 </Grid>
 
                 <Button fullWidth type="submit" variant="contained" size="large"
                   sx={{ mt: 4, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', py: 1.5, fontSize: '1.1rem', fontWeight: 'bold', borderRadius: 2, '&:hover': { transform: 'scale(1.02)', boxShadow: 4 } }}
                 >
-                  Register
+                  {t('register')}
                 </Button>
 
                 <Box sx={{ textAlign: 'center', mt: 3 }}>
                   <Typography variant="body2" color="text.secondary">
-                    Already have an account?{' '}
+                    {t('alreadyAccount')}{' '}
                     <MuiLink component={Link} to="/login" sx={{ color: '#667eea', fontWeight: 'bold', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
-                      Login here
+                      {t('loginHere')}
                     </MuiLink>
                   </Typography>
                 </Box>

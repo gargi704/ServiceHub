@@ -515,13 +515,13 @@ function CustomerProfile() {
                   <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: '#333' }}>
                     {t('quickActions')}
                   </Typography>
-                  <Button
+                  {/* <Button
                     fullWidth
                     variant="outlined"
                     sx={{ mb: 2 }}
                   >
                     {t('paymentMethods')}
-                  </Button>
+                  </Button> */}
                   <Button
                     fullWidth
                     variant="outlined"
